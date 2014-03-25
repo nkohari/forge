@@ -1,0 +1,12 @@
+{
+  "name": "forge",
+  "version": "1.0.0",
+  "description": "build some stuff",
+  "dependencies": {
+    "underscore": "1.6.0"
+  },
+  "devDependencies": {
+    "chai": "1.9.1",
+    "mocha": "1.18.2"
+  }
+}
