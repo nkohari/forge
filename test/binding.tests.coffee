@@ -3,6 +3,7 @@ Container       = require '../src/Container'
 ResolutionError = require '../src/errors/ResolutionError'
 Foo             = require './lib/Foo'
 Bar             = require './lib/Bar'
+TypeWithHints   = require './lib/TypeWithHints'
 
 describe 'Binding', ->
 
@@ -61,3 +62,15 @@ describe 'Binding', ->
         result = container.get('foo')
         expect(result).to.be.instanceOf(Foo)
         expect(wasCalled).to.be.true
+
+    describe 'with a binding to a type that contains hints', ->
+
+      container = new Container()
+      container.bind('foo').to.type(Foo)
+      container.bind('hinted').to.type(TypeWithHints)
+
+      it 'should create an instance of TypeWithHints with two instances of Foo', ->
+        result = container.get('hinted')
+        expect(result).to.be.an.instanceOf(TypeWithHints)
+        expect(result.dep1).to.be.an.instanceOf(Foo)
+        expect(result.dep2).to.be.an.instanceOf(Foo)

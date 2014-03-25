@@ -5,20 +5,27 @@ class TypeResolver extends Resolver
 
   constructor: (container, @type) ->
     super(container)
-    @parameters = @getParameterNames(@type)
+    params = @getParameterNames(@type)
+    hints  = @getHints(@type)
+    @dependencies = _.map params, (param) -> hints[param] ? param
 
   resolve: ->
-    args = _.map @parameters, (param) => @container.get(param)
+    args = _.map @dependencies, (name) => @container.get(name)
     ctor = @type.bind.apply(@type, [null].concat(args))
     return new ctor()
 
   getParameterNames: (type) ->
     regex   = /function .*\(([^)]+)/g
     matches = regex.exec type.toString()
-    if !matches? or matches[1].length == 0
-      return []
-    else
-      args = matches[1].split /[,\s]+/
-      return args
+    return [] if !matches? or matches[1].length == 0
+    return matches[1].split /[,\s]+/
+
+  getHints: (type) ->
+    regex = /"(.*?)\s*->\s*(.*?)";/g
+    hints = {}
+    while match = regex.exec(type.toString())
+      [hint, argument, dependency] = match
+      hints[argument] = dependency
+    return hints
 
 module.exports = TypeResolver
