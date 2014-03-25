@@ -1,28 +1,38 @@
-expect    = require('chai').expect
-Container = require '../src/Container'
-Foo       = require './lib/Foo'
-Bar       = require './lib/Bar'
+expect          = require('chai').expect
+Container       = require '../src/Container'
+ResolutionError = require '../src/errors/ResolutionError'
+Foo             = require './lib/Foo'
+Bar             = require './lib/Bar'
 
-describe 'Given a Container', ->
+describe 'Binding', ->
 
-  container = new Container()
+  describe 'given a Container', ->
 
-  describe 'with a single type binding from foo to Foo', ->
+    describe 'with a type binding foo->Foo', ->
 
-    container.bind('foo', Foo)
+      container = new Container()
+      container.bind('foo').to(Foo).asSingleton()
 
-    it 'should an instance of Foo when foo is requested', ->
+      it 'should create an instance of Foo when foo is requested', ->
+        result = container.get('foo')
+        expect(result).to.be.an.instanceOf(Foo)
 
-      result = container.get('foo')
-      expect(result).to.be.an.instanceOf(Foo)
+    describe 'with type bindings foo->Foo and bar->Bar', ->
 
-  describe 'with two bindings', ->
+      container = new Container()
+      container.bind('foo').to(Foo).asSingleton()
+      container.bind('bar').to(Bar).asSingleton()
 
-    container.bind('foo', Foo)
-    container.bind('bar', Bar)
+      it 'should inject an instance of Foo into an instance of Bar', ->
+        result = container.get('bar')
+        expect(result).to.be.an.instanceOf(Bar)
+        expect(result.foo).to.be.an.instanceOf(Foo)
 
-    it 'should inject an instance of Foo into an instance of Bar', ->
+    describe 'with a type binding bar->Bar, and no binding for foo', ->
 
-      result = container.get('bar')
-      expect(result).to.be.an.instanceOf(Bar)
-      expect(result.foo).to.be.an.instanceOf(Foo)
+      container = new Container()
+      container.bind('bar').to(Bar).asSingleton()
+
+      it 'should throw a ResolutionError if bar is requested', ->
+        resolve = -> container.get('bar')
+        expect(resolve).to.throw(ResolutionError)

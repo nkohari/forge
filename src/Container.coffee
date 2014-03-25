@@ -1,7 +1,5 @@
-_               = require 'underscore'
-FunctionBinding = require './binding/FunctionBinding'
-InstanceBinding = require './binding/InstanceBinding'
-TypeBinding     = require './binding/TypeBinding'
+Binding         = require './Binding'
+ResolutionError = require './errors/ResolutionError'
 
 class Container
 
@@ -10,17 +8,10 @@ class Container
 
   get: (name) ->
     binding = @bindings[name]
-    unless binding?
-      throw new Error("A component named #{name} was requested, but no binding was available")
+    throw new ResolutionError(name, 'No binding was available') unless binding?
     return binding.resolve()
 
-  bind: (name, target) ->
-    if target.constructor?       then binding = new TypeBinding(this, name, target)
-    else if _.isFunction(target) then binding = new FunctionBinding(this, name, target)
-    else if _.isObject(target)   then binding = new InstanceBinding(this, name, target)
-    else
-      throw new Error("Invalid binding target for component named #{name}")
-    @bindings[name] = binding
-    return binding
+  bind: (name) ->
+    return @bindings[name] = new Binding(this, name)
 
 module.exports = Container
