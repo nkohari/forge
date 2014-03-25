@@ -2,8 +2,8 @@ Resolver = require './Resolver'
 
 class FunctionResolver extends Resolver
 
-  constructor: (container, @func) ->
-    super(container)
+  constructor: (forge, @func) ->
+    super(forge)
 
   resolve: ->
     @func()

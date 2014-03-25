@@ -1,6 +1,6 @@
 class Resolver
 
-  constructor: (@container) ->
+  constructor: (@forge) ->
 
   resolve: ->
     throw new Error("You must implement resolve() on #{@constructor.name}")

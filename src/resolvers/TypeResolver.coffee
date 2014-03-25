@@ -3,14 +3,14 @@ Resolver = require './Resolver'
 
 class TypeResolver extends Resolver
 
-  constructor: (container, @type) ->
-    super(container)
+  constructor: (forge, @type) ->
+    super(forge)
     params = @getParameterNames(@type)
     hints  = @getHints(@type)
     @dependencies = _.map params, (param) -> hints[param] ? param
 
   resolve: ->
-    args = _.map @dependencies, (name) => @container.get(name)
+    args = _.map @dependencies, (name) => @forge.get(name)
     ctor = @type.bind.apply(@type, [null].concat(args))
     return new ctor()
 

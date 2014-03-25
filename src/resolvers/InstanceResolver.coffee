@@ -2,8 +2,8 @@ Resolver = require './Resolver'
 
 class InstanceResolver extends Resolver
 
-  constructor: (container, @instance) ->
-    super(container)
+  constructor: (forge, @instance) ->
+    super(forge)
 
   resolve: ->
     @instance
