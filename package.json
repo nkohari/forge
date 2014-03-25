@@ -1,12 +1,27 @@
 {
   "name": "forge",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "build some stuff",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/nkohari/forge.git"
+  },
+  "author": {
+    "name": "Nate Kohari",
+    "email": "nkohari@gmail.com",
+    "url": "http://nate.io/"
+  },
+  "main": "./build/Container.js",
   "dependencies": {
     "underscore": "1.6.0"
   },
   "devDependencies": {
+    "coffee-script": "1.7.1",
     "chai": "1.9.1",
     "mocha": "1.18.2"
+  },
+  "scripts": {
+    "test": "mocha --compilers coffee:coffee-script/register --reporter spec",
+    "prepublish": "coffee -o build src"
   }
 }
