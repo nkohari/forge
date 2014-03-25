@@ -11,7 +11,7 @@ describe 'Lifecycle', ->
     describe 'with a singleton binding for foo', ->
 
       container = new Container()
-      container.bind('foo').to(Foo).asSingleton()
+      container.bind('foo').to.type(Foo).as.singleton()
 
       it 'should create an instance of Foo when foo is requested', ->
         result = container.get('foo')
@@ -25,7 +25,7 @@ describe 'Lifecycle', ->
     describe 'with a transient binding for foo', ->
 
       container = new Container()
-      container.bind('foo').to(Foo).asTransient()
+      container.bind('foo').to.type(Foo).as.transient()
 
       it 'should create an instance of Foo when foo is requested', ->
         result = container.get('foo')

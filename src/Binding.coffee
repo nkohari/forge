@@ -1,3 +1,4 @@
+_                  = require 'underscore'
 FunctionResolver   = require './resolvers/FunctionResolver'
 InstanceResolver   = require './resolvers/InstanceResolver'
 TypeResolver       = require './resolvers/TypeResolver'
@@ -6,28 +7,40 @@ TransientLifecycle = require './lifecycles/TransientLifecycle'
 BindingError       = require './errors/BindingError'
 ResolutionError    = require './errors/ResolutionError'
 
+sweeten = (type, property) ->
+  Object.defineProperty type.prototype, property,
+    get: -> return this
+
 class Binding
 
   constructor: (@container, @name) ->
+    @lifecycle = new SingletonLifecycle() # default
 
   resolve: ->
     throw new ResolutionError(@name, 'No lifecycle defined') unless @lifecycle?
     throw new ResolutionError(@name, 'No resolver defined')  unless @resolver?
     return @lifecycle.getInstance(@resolver)
 
-  to: (target) ->
-    if target.constructor?       then @resolver = new TypeResolver(@container, target)
-    else if _.isFunction(target) then @resolver = new FunctionResolver(@container, target)
-    else if _.isObject(target)   then @resolver = new InstanceResolver(@container, target)
-    else
-      throw new BindingError(@name, "Invalid binding target: #{target}")
+  sweeten(this, 'to')
+  sweeten(this, 'as')
+
+  type: (target) ->
+    @resolver = new TypeResolver(@container, target)
     return this
 
-  asSingleton: ->
+  function: (target) ->
+    @resolver = new FunctionResolver(@container, target)
+    return this
+
+  instance: (target) ->
+    @resolver = new InstanceResolver(@container, target)
+    return this
+
+  singleton: ->
     @lifecycle = new SingletonLifecycle()
     return this
 
-  asTransient: ->
+  transient: ->
     @lifecycle = new TransientLifecycle()
     return this
 
