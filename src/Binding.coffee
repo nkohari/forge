@@ -11,6 +11,11 @@ sweeten = (type, property) ->
   Object.defineProperty type.prototype, property,
     get: -> return this
 
+chain = (func) ->
+  return (args...) ->
+    result = func.apply(this, args)
+    return this
+
 class Binding
 
   constructor: (@forge, @name) ->
@@ -24,24 +29,11 @@ class Binding
   sweeten(this, 'to')
   sweeten(this, 'as')
 
-  type: (target) ->
-    @resolver = new TypeResolver(@forge, target)
-    return this
+  type:     chain (target) -> @resolver = new TypeResolver(@forge, target)
+  function: chain (target) -> @resolver = new FunctionResolver(@forge, target)
+  instance: chain (target) -> @resolver = new InstanceResolver(@forge, target)
 
-  function: (target) ->
-    @resolver = new FunctionResolver(@forge, target)
-    return this
-
-  instance: (target) ->
-    @resolver = new InstanceResolver(@forge, target)
-    return this
-
-  singleton: ->
-    @lifecycle = new SingletonLifecycle()
-    return this
-
-  transient: ->
-    @lifecycle = new TransientLifecycle()
-    return this
+  singleton: chain -> @lifecycle = new SingletonLifecycle()
+  transient: chain -> @lifecycle = new TransientLifecycle()
 
 module.exports = Binding
