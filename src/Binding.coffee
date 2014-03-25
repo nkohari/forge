@@ -13,7 +13,7 @@ sweeten = (type, property) ->
 
 class Binding
 
-  constructor: (@container, @name) ->
+  constructor: (@forge, @name) ->
     @lifecycle = new SingletonLifecycle() # default
 
   resolve: ->
@@ -25,15 +25,15 @@ class Binding
   sweeten(this, 'as')
 
   type: (target) ->
-    @resolver = new TypeResolver(@container, target)
+    @resolver = new TypeResolver(@forge, target)
     return this
 
   function: (target) ->
-    @resolver = new FunctionResolver(@container, target)
+    @resolver = new FunctionResolver(@forge, target)
     return this
 
   instance: (target) ->
-    @resolver = new InstanceResolver(@container, target)
+    @resolver = new InstanceResolver(@forge, target)
     return this
 
   singleton: ->

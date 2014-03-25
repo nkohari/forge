@@ -1,7 +1,7 @@
 Binding         = require './Binding'
 ResolutionError = require './errors/ResolutionError'
 
-class Container
+class Forge
 
   constructor: ->
     @bindings = {}
@@ -14,4 +14,4 @@ class Container
   bind: (name) ->
     return @bindings[name] = new Binding(this, name)
 
-module.exports = Container
+module.exports = Forge

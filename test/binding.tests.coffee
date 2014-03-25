@@ -1,5 +1,5 @@
 expect          = require('chai').expect
-Container       = require '../src/Container'
+Forge           = require '../src/Forge'
 ResolutionError = require '../src/errors/ResolutionError'
 Foo             = require './lib/Foo'
 Bar             = require './lib/Bar'
@@ -7,45 +7,45 @@ TypeWithHints   = require './lib/TypeWithHints'
 
 describe 'Binding', ->
 
-  describe 'given a Container', ->
+  describe 'given a Forge', ->
 
     describe 'with a type binding foo->Foo', ->
 
-      container = new Container()
-      container.bind('foo').to.type(Foo)
+      forge = new Forge()
+      forge.bind('foo').to.type(Foo)
 
       it 'should create an instance of Foo when foo is requested', ->
-        result = container.get('foo')
+        result = forge.get('foo')
         expect(result).to.be.an.instanceOf(Foo)
 
     describe 'with type bindings foo->Foo and bar->Bar', ->
 
-      container = new Container()
-      container.bind('foo').to.type(Foo)
-      container.bind('bar').to.type(Bar)
+      forge = new Forge()
+      forge.bind('foo').to.type(Foo)
+      forge.bind('bar').to.type(Bar)
 
       it 'should inject an instance of Foo into an instance of Bar', ->
-        result = container.get('bar')
+        result = forge.get('bar')
         expect(result).to.be.an.instanceOf(Bar)
         expect(result.foo).to.be.an.instanceOf(Foo)
 
     describe 'with a type binding bar->Bar, and no binding for foo', ->
 
-      container = new Container()
-      container.bind('bar').to.type(Bar)
+      forge = new Forge()
+      forge.bind('bar').to.type(Bar)
 
       it 'should throw a ResolutionError if bar is requested', ->
-        resolve = -> container.get('bar')
+        resolve = -> forge.get('bar')
         expect(resolve).to.throw(ResolutionError)
 
     describe 'with an instance binding for foo', ->
 
-      instance  = new Foo()
-      container = new Container()
-      container.bind('foo').to.instance(instance)
+      instance = new Foo()
+      forge = new Forge()
+      forge.bind('foo').to.instance(instance)
 
       it 'should return the bound instance when foo is requested', ->
-        result = container.get('foo')
+        result = forge.get('foo')
         expect(result).to.equal(instance)
 
     describe 'with an function binding for foo', ->
@@ -55,22 +55,23 @@ describe 'Binding', ->
         wasCalled = true
         return new Foo()
 
-      container = new Container()
-      container.bind('foo').to.function(func)
+      forge = new Forge()
+      forge.bind('foo').to.function(func)
 
       it 'should call the bound function when foo is requested', ->
-        result = container.get('foo')
+        result = forge.get('foo')
         expect(result).to.be.instanceOf(Foo)
         expect(wasCalled).to.be.true
 
     describe 'with a binding to a type that contains hints', ->
 
-      container = new Container()
-      container.bind('foo').to.type(Foo)
-      container.bind('hinted').to.type(TypeWithHints)
+      forge = new Forge()
+      forge.bind('foo').to.type(Foo)
+      forge.bind('bar').to.type(Bar)
+      forge.bind('hinted').to.type(TypeWithHints)
 
-      it 'should create an instance of TypeWithHints with two instances of Foo', ->
-        result = container.get('hinted')
+      it 'should inject an instance of Foo and Bar into an instance of TypeWithHints', ->
+        result = forge.get('hinted')
         expect(result).to.be.an.instanceOf(TypeWithHints)
         expect(result.dep1).to.be.an.instanceOf(Foo)
-        expect(result.dep2).to.be.an.instanceOf(Foo)
+        expect(result.dep2).to.be.an.instanceOf(Bar)

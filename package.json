@@ -11,7 +11,7 @@
     "email": "nkohari@gmail.com",
     "url": "http://nate.io/"
   },
-  "main": "./build/Container.js",
+  "main": "./build/Forge.js",
   "dependencies": {
     "underscore": "1.6.0"
   },
