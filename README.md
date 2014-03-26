@@ -23,7 +23,7 @@ will find it useful as well.
 You can install Forge from npm:
 
 ```
-$ npm install forge
+$ npm install forge-di
 ```
 
 ## So how's it work?
@@ -36,7 +36,7 @@ Forge, like many other DI frameworks, allow you to define loosely-coupled compon
 way, and then wires them together for you as necessary. Here's a quick example of typical usage:
 
 ```coffeescript
-Forge = require 'forge'
+Forge = require 'forge-di'
 
 # A class with a single dependency
 class Foo
@@ -61,19 +61,23 @@ Forge works by examining the names of the constructor parameters on your types. 
 the constructor of the class `Foo` had a parameter called `bar`. Forge sees this as a dependency,
 resolves the component named `bar` and passes the resolved instance to the constructor of `Foo`.
 
-If you don't like this convention, you can also do *component hinting*, the syntax of which is
-reminiscent of `use strict`:
+If you don't like this convention, you can add *component hints*, the syntax of which is reminiscent
+of `use strict`:
 
 ```coffeescript
-class TypeWithHinting
+class TypeWithHints
   constructor: (@dependency1, @dependency2) ->
     "dependency1->foo"
     "dependency2->bar"
 ```
 
-When Forge creates an instance of `TypeWithHinting`, instead of trying to resolve components named
+When Forge creates an instance of `TypeWithHints`, instead of trying to resolve components named
 `dependency1` and `dependency2`, instead it will read the hints, and resolve components named `foo`
 and `bar` instead.
+
+## Lifecycles and garbage collection
+
+More to come.
 
 ## License
 
