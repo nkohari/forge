@@ -8,4 +8,7 @@ class FunctionResolver extends Resolver
   resolve: ->
     @func()
 
+  toString: ->
+    'function'
+
 module.exports = FunctionResolver

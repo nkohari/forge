@@ -10,7 +10,7 @@ describe 'Binding', ->
 
   describe 'Basics', ->
 
-    describe 'given a type binding a->Foo', ->
+    describe 'given one binding: a->type{Foo}', ->
 
       forge = new Forge()
       forge.bind('a').to.type(Foo)
@@ -19,7 +19,7 @@ describe 'Binding', ->
         a = forge.get('a')
         expect(a).to.be.an.instanceOf(Foo)
 
-    describe 'given type bindings a->Foo and b->Bar', ->
+    describe 'given two bindings: a->type{Foo} and b->type{Bar}', ->
 
       forge = new Forge()
       forge.bind('a').to.type(Foo)
@@ -35,7 +35,7 @@ describe 'Binding', ->
 
   describe 'Dependency resolution', ->
 
-    describe 'given type bindings foo->Foo and dependent->DependsOnFoo', ->
+    describe 'given two bindings: foo->type{Foo} and dependent->type{DependsOnFoo}', ->
 
       forge = new Forge()
       forge.bind('foo').to.type(Foo)
@@ -46,7 +46,7 @@ describe 'Binding', ->
         expect(result).to.be.an.instanceOf(DependsOnFoo)
         expect(result.foo).to.be.an.instanceOf(Foo)
 
-    describe 'given a type binding dependent->DependsOnFoo, and no binding for foo', ->
+    describe 'given one binding: dependent->type{DependsOnFoo}, and no binding for foo', ->
 
       forge = new Forge()
       forge.bind('dependent').to.type(DependsOnFoo)
@@ -59,7 +59,7 @@ describe 'Binding', ->
 
   describe 'Instance and function bindings', ->
 
-    describe 'given an instance binding for "a"', ->
+    describe 'given one binding: a->instance{Foo}', ->
 
       instance = new Foo()
       forge = new Forge()
@@ -69,7 +69,7 @@ describe 'Binding', ->
         result = forge.get('a')
         expect(result).to.equal(instance)
 
-    describe 'given an function binding for "a"', ->
+    describe 'given one binding: a->function', ->
 
       wasCalled = false
       func = ->
@@ -105,7 +105,7 @@ describe 'Binding', ->
 
   describe 'Multiple bindings for same service', ->
 
-    describe 'given two type bindings, a->Foo and a->Foo', ->
+    describe 'given two bindings: a->type{Foo} and a->type{Foo}', ->
 
       forge = new Forge()
       forge.bind('a').to.type(Foo)
@@ -126,7 +126,7 @@ describe 'Binding', ->
 
   describe 'Conditional bindings and resolution hints', ->
 
-    describe 'given two conditional type bindings, a->Foo and a->Bar', ->
+    describe 'given two conditional bindings: a?->type{Foo} and a?->type{Bar}', ->
 
       forge = new Forge()
       forge.bind('a').to.type(Foo).when (hint) -> hint == 1

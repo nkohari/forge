@@ -14,6 +14,9 @@ class TypeResolver extends Resolver
     ctor = @type.bind.apply(@type, [null].concat(args))
     return new ctor()
 
+  toString: ->
+    "type{#{@type.name}}"
+
   getParameterNames: (type) ->
     regex   = /function .*\(([^)]+)/g
     matches = regex.exec type.toString()

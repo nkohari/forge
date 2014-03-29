@@ -19,10 +19,9 @@ class Binding
 
   constructor: (@forge, @name) ->
     @lifecycle = new SingletonLifecycle() # default
-    @predicate = -> true
 
   matches: (hint) ->
-    @predicate(hint)
+    if @predicate? then @predicate(hint) else true
 
   resolve: ->
     throw new ConfigurationError(@name, 'No lifecycle defined') unless @lifecycle?
@@ -40,5 +39,15 @@ class Binding
   transient: chain -> @lifecycle = new TransientLifecycle()
 
   when: chain (predicate) -> @predicate = predicate
+
+  toString: ->
+    tokens = [@name]
+    tokens.push '?' if @predicate?
+    tokens.push '->'
+    if @resolver?
+      tokens.push @resolver.toString()
+    else
+      tokens.push '?'
+    return tokens.join('')
 
 module.exports = Binding
