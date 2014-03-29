@@ -4,8 +4,7 @@ InstanceResolver   = require './resolvers/InstanceResolver'
 TypeResolver       = require './resolvers/TypeResolver'
 SingletonLifecycle = require './lifecycles/SingletonLifecycle'
 TransientLifecycle = require './lifecycles/TransientLifecycle'
-BindingError       = require './errors/BindingError'
-ResolutionError    = require './errors/ResolutionError'
+ConfigurationError = require './errors/ConfigurationError'
 
 sweeten = (type, property) ->
   Object.defineProperty type.prototype, property,
@@ -20,10 +19,14 @@ class Binding
 
   constructor: (@forge, @name) ->
     @lifecycle = new SingletonLifecycle() # default
+    @predicate = -> true
+
+  matches: (hint) ->
+    @predicate(hint)
 
   resolve: ->
-    throw new ResolutionError(@name, 'No lifecycle defined') unless @lifecycle?
-    throw new ResolutionError(@name, 'No resolver defined')  unless @resolver?
+    throw new ConfigurationError(@name, 'No lifecycle defined') unless @lifecycle?
+    throw new ConfigurationError(@name, 'No resolver defined')  unless @resolver?
     return @lifecycle.getInstance(@resolver)
 
   sweeten(this, 'to')
@@ -35,5 +38,7 @@ class Binding
 
   singleton: chain -> @lifecycle = new SingletonLifecycle()
   transient: chain -> @lifecycle = new TransientLifecycle()
+
+  when: chain (predicate) -> @predicate = predicate
 
 module.exports = Binding
