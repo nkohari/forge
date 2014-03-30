@@ -8,7 +8,7 @@ describe 'Lifecycle', ->
 
 #---------------------------------------------------------------------------------------------------
 
-  describe 'given a binding from a->Foo with a singleton lifecycle', ->
+  describe 'given one binding: a->Foo, with a singleton lifecycle', ->
 
     forge = new Forge()
     forge.bind('a').to.type(Foo).as.singleton()
@@ -24,7 +24,7 @@ describe 'Lifecycle', ->
 
 #---------------------------------------------------------------------------------------------------
 
-  describe 'given a binding from a->Foo with a transient lifecycle', ->
+  describe 'given one binding: a->Foo, with a transient lifecycle', ->
 
     forge = new Forge()
     forge.bind('a').to.type(Foo).as.transient()

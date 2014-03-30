@@ -111,16 +111,16 @@ describe 'Binding', ->
       forge.bind('a').to.type(Foo)
       forge.bind('a').to.type(Foo)
 
-      it 'should throw an exception if get() is called for "a"', ->
-        resolve = -> forge.get('service')
-        expect(resolve).to.throw(ResolutionError)
-
-      it 'should return an array of two instances of Foo when getAll() is called for "a"', ->
-        results = forge.getAll('a')
+      it 'should return an array of two instances of Foo when get() is called for "a"', ->
+        results = forge.get('a')
         expect(results).to.be.an.array
         expect(results.length).to.equal(2)
         expect(results[0]).to.be.an.instanceOf(Foo)
         expect(results[1]).to.be.an.instanceOf(Foo)
+
+      it 'should throw an exception if getOne() is called for "a"', ->
+        resolve = -> forge.getOne('a')
+        expect(resolve).to.throw(ResolutionError)
 
 #---------------------------------------------------------------------------------------------------
 
