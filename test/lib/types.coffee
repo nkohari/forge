@@ -12,4 +12,17 @@ class TypeWithBindingHints
     "dep1->a"
     "dep2->b"
 
-module.exports = {Foo, Bar, DependsOnFoo, TypeWithBindingHints}
+class CircularA
+  constructor: (@b) ->
+
+class CircularB
+  constructor: (@a) ->
+
+module.exports = {
+  Foo
+  Bar
+  DependsOnFoo
+  TypeWithBindingHints
+  CircularA
+  CircularB
+}

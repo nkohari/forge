@@ -5,6 +5,7 @@ TypeResolver       = require './resolvers/TypeResolver'
 SingletonLifecycle = require './lifecycles/SingletonLifecycle'
 TransientLifecycle = require './lifecycles/TransientLifecycle'
 ConfigurationError = require './errors/ConfigurationError'
+ResolutionError    = require './errors/ResolutionError'
 
 sweeten = (type, property) ->
   Object.defineProperty type.prototype, property,
@@ -19,14 +20,19 @@ class Binding
 
   constructor: (@forge, @name) ->
     @lifecycle = new SingletonLifecycle() # default
+    @isResolving = false
 
   matches: (hint) ->
     if @predicate? then @predicate(hint) else true
 
   resolve: ->
     throw new ConfigurationError(@name, 'No lifecycle defined') unless @lifecycle?
-    throw new ConfigurationError(@name, 'No resolver defined')  unless @resolver?
-    return @lifecycle.getInstance(@resolver)
+    throw new ConfigurationError(@name, 'No resolver defined') unless @resolver?
+    throw new ResolutionError(@name, 'Circular dependencies detected') if @isResolving
+    @isResolving = true
+    result = @lifecycle.getInstance(@resolver)
+    @isResolving = false
+    return result
 
   sweeten(this, 'to')
   sweeten(this, 'as')
