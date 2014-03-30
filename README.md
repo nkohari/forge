@@ -5,15 +5,25 @@
 Forge is a dependency injection framework for Node.js. It was built primarily as an experiment,
 and probably isn't production-ready just yet.
 
+**Table of Contents**
+
+- [Foreward, and forewarning](#foreward-and-forewarning)
+- [Getting started](#getting-started)
+- [So how's it work?](#so-hows-it-work)
+- [Dependency hints](#dependency-hints)
+- [Multiple bindings for a single component](#multiple-bindings-for-a-single-component)
+- [Conditional bindings and resolution hints](#conditional-bindings-and-resolution-hints)
+- [Lifecycles](#lifecycles)
+- [License](#license)
+
 ## Foreward, and forewarning
 
-First things first: I'm fairly certain that the existence of this framework will be somewhat
-controversial. The general sentiment is that in a loosely-typed, dynamic language like JavaScript,
-framework-aided dependency injection is unnecessary.
+First things first: I'm fairly certain that the existence of this framework will be controversial.
+The general sentiment is that in a loosely-typed, dynamic language like JavaScript, framework-aided
+dependency injection is unnecessary.
 
 Having now written two sizable projects in Node, I've come to believe that an object-oriented
-approach backed by a dependency injection system is the most effective way to develop complex
-solutions.
+approach backed by a dependency injection system is the most effective way to develop complex systems.
 
 This is something I built to scratch my own itch, and have released it in the hopes that others
 will find it useful as well.
@@ -32,8 +42,8 @@ The API of Forge is inspired by some of my previous work on [Ninject](http://nin
 a dependency injection framework for .NET. I wouldn't go so far as to call Forge "Ninject for Node,"
 but it's not an entirely unreasonable moniker.
 
-Forge, like many other DI frameworks, allow you to define loosely-coupled components in a declarative
-way, and then wires them together for you as necessary. Here's a quick example of typical usage:
+Forge allows you to define loosely-coupled components in a declarative way, and then wires them
+together for you as necessary. Here's a quick example of typical usage:
 
 ```coffeescript
 Forge = require 'forge-di'
@@ -61,7 +71,10 @@ Forge works by examining the names of the constructor parameters on your types. 
 the constructor of the class `Foo` had a parameter called `bar`. Forge sees this as a dependency,
 resolves the component named `bar` and passes the resolved instance to the constructor of `Foo`.
 
-If you don't like this convention, you can add *component hints*, the syntax of which is reminiscent
+## Dependency hints
+
+If you don't want to rely on the convention of naming your constructor arguments the same as your
+components, you can add *dependency hints* to your types instead. The syntax is reminiscent
 of `use strict`:
 
 ```coffeescript
@@ -75,9 +88,124 @@ When Forge creates an instance of `TypeWithHints`, instead of trying to resolve 
 `dependency1` and `dependency2`, instead it will read the hints, and resolve components named `foo`
 and `bar` instead.
 
-## Lifecycles and garbage collection
+## Multiple bindings for a single component
 
-More to come.
+You can also register multiple bindings for a single component name. For example, you might want
+to create a class that can operate as a facade over an arbitrary number of plugins:
+
+```coffeescript
+Forge = require 'forge-di'
+
+class PluginOne
+  constructor: ->
+
+class PluginTwo
+  constructor: ->
+
+class Facade
+  constructor: (@plugins) ->
+
+# Register multiple bindings for the "plugins" component
+forge = new Forge()
+forge.bind('plugins').to.type(PluginOne)
+forge.bind('plugins').to.type(PluginTwo)
+forge.bind('facade').to.type(Facade)
+
+# Forge passes an array of instances to the Facade constructor
+facade = forge.get('facade')
+assert(typeof facade.plugins == 'array')
+assert(facade.plugins.length == 2)
+assert(facade.plugins[0] instanceof PluginOne)
+assert(facade.plugins[1] instanceof PluginTwo)
+```
+
+To support this behavior, `Forge.get()` will return a single instance when only one matching
+binding is available, and an array of instances when multiple bindings are available. To be
+certain that you only resolve a single instance, you can call `Forge.getOne()` instead.
+This function will throw an exception if more than one matching binding would be resolved.
+
+## Conditional bindings and resolution hints
+
+Since you can register multiple bindings for a single component, you might not always want
+to resolve all of them for a given scenario. To allow this, Forge supports *conditional bindings*,
+which are bindings with a predicate attached. These predicates examine *resolution hints*
+that you pass to `Forge.get()`. For example:
+
+```coffeescript
+Forge = require 'forge-di'
+
+class RedFoo
+  constructor: ->
+
+class BlueFoo
+  constructor: ->
+
+# Register multiple bindings to the same component, with predicates
+forge = new Forge()
+forge.bind('foo').to.type(RedFoo).when (hint) -> hint == 'red'
+forge.bind('foo').to.type(BlueFoo).when (hint) -> hint == 'blue'
+
+# Forge passes the resolution hint to the bindings' predicates to determine which to resolve
+foo1 = forge.get('foo', 'red')
+foo2 = forge.get('foo', 'blue')
+assert(foo1 instanceof RedFoo)
+assert(foo2 instanceof BlueFoo)
+```
+
+If multiple bindings match, `Forge.get()` will return an array of results.
+
+## Lifecycles
+
+By default, once a binding has been resolved, the result will be cached and re-used for
+subsequent requests. This is called a *singleton* lifecycle, after the pattern of the same
+name.
+
+You can define a lifecycle for a binding using the following syntax:
+
+```coffeescript
+Forge = require 'forge-di'
+
+class Foo
+  constructor: (@bar) ->
+
+class Bar
+  constructor: ->
+
+forge = new Forge()
+
+# Since singleton is the default lifecycle, you can also omit .as.singleton()
+forge.bind('foo').to.type(Foo)
+forge.bind('bar').to.type(Bar).as.singleton()
+
+# The instance of Bar is created on the first request, and then is re-used when creating Foo
+bar = forge.get('bar')
+foo = forge.get('foo')
+assert(foo.bar === bar)
+```
+
+Forge also supports a *transient* lifecycle, which means that a new result will be resolved
+on each request for a given component. Here's the same example as above, using the transient
+lifecycle instead:
+
+```coffeescript
+Forge = require 'forge-di'
+
+class Foo
+  constructor: (@bar) ->
+
+class Bar
+  constructor: ->
+
+forge = new Forge()
+
+forge.bind('foo').to.type(Foo)
+forge.bind('bar').to.type(Bar).as.transient()
+
+# There were two instances of Bar created
+bar = forge.get('bar')
+foo = forge.get('foo')
+assert(foo.bar !== bar)
+```
 
 ## License
 
