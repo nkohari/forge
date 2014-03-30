@@ -1,7 +1,7 @@
 {
   "name": "forge-di",
-  "version": "0.2.0",
-  "description": "build some stuff",
+  "version": "0.3.0",
+  "description": "a dependency injector for node.js",
   "repository": {
     "type": "git",
     "url": "http://github.com/nkohari/forge.git"
