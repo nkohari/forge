@@ -1,3 +1,4 @@
+assert             = require 'assert'
 _                  = require 'underscore'
 FunctionResolver   = require './resolvers/FunctionResolver'
 InstanceResolver   = require './resolvers/InstanceResolver'
@@ -19,6 +20,8 @@ chain = (func) ->
 class Binding
 
   constructor: (@forge, @name) ->
+    assert @forge?, 'The argument "forge" must have a value'
+    assert @name?,  'The argument "name" must have a value'
     @lifecycle = new SingletonLifecycle() # default
     @isResolving = false
 
@@ -37,14 +40,27 @@ class Binding
   sweeten(this, 'to')
   sweeten(this, 'as')
 
-  type:     chain (target) -> @resolver = new TypeResolver(@forge, target)
-  function: chain (target) -> @resolver = new FunctionResolver(@forge, target)
-  instance: chain (target) -> @resolver = new InstanceResolver(@forge, target)
+  type: chain (target) ->
+    assert target?, 'The argument "target" must have a value'
+    @resolver = new TypeResolver(@forge, target)
 
-  singleton: chain -> @lifecycle = new SingletonLifecycle()
-  transient: chain -> @lifecycle = new TransientLifecycle()
+  function: chain (target) ->
+    assert target?, 'The argument "target" must have a value'
+    @resolver = new FunctionResolver(@forge, target)
 
-  when: chain (predicate) -> @predicate = predicate
+  instance: chain (target) ->
+    assert target?, 'The argument "target" must have a value'
+    @resolver = new InstanceResolver(@forge, target)
+
+  singleton: chain ->
+    @lifecycle = new SingletonLifecycle()
+
+  transient: chain ->
+    @lifecycle = new TransientLifecycle()
+
+  when: chain (predicate) ->
+    assert predicate?, 'The argument "predicate" must have a value'
+    @predicate = predicate
 
   toString: ->
     tokens = [@name]

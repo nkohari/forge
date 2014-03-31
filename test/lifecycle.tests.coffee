@@ -4,11 +4,11 @@ ResolutionError = require '../src/errors/ResolutionError'
 
 {Foo} = require './lib/types'
 
-describe 'Lifecycles', ->
+describe 'Lifecycle', ->
 
 #---------------------------------------------------------------------------------------------------
 
-  describe 'Singleton', ->
+  describe 'Singleton lifecycle', ->
 
     describe 'given one binding: a->Foo, with a singleton lifecycle', ->
 
@@ -26,7 +26,7 @@ describe 'Lifecycles', ->
 
 #---------------------------------------------------------------------------------------------------
 
-  describe 'Transient', ->
+  describe 'Transient lifecycle', ->
 
     describe 'given one binding: a->Foo, with a transient lifecycle', ->
 

@@ -1,3 +1,4 @@
+assert          = require 'assert'
 _               = require 'underscore'
 Binding         = require './Binding'
 ResolutionError = require './errors/ResolutionError'
@@ -8,11 +9,13 @@ class Forge
     @bindings = {}
 
   bind: (name) ->
+    assert name?, 'The argument "name" must have a value'
     binding = new Binding(this, name)
     (@bindings[name] ?= []).push(binding)
     return binding
 
   get: (name, hint) ->
+    assert name?, 'The argument "name" must have a value'
     matches = @getMatchingBindings(name, hint)
     if matches.length == 0
       throw new ResolutionError(name, 'No matching bindings were available')
@@ -20,6 +23,7 @@ class Forge
     return if results.length == 1 then results[0] else results
 
   getOne: (name, hint) ->
+    assert name?, 'The argument "name" must have a value'
     matches = @getMatchingBindings(name, hint)
     if matches.length == 0
       throw new ResolutionError(name, 'No matching bindings were available')
@@ -28,6 +32,7 @@ class Forge
     return matches[0].resolve()
 
   getMatchingBindings: (name, hint) ->
+    assert name?, 'The argument "name" must have a value'
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
 

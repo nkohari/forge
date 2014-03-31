@@ -1,3 +1,4 @@
+assert   = require 'assert'
 _        = require 'underscore'
 Resolver = require './Resolver'
 
@@ -5,6 +6,7 @@ class InstanceResolver extends Resolver
 
   constructor: (forge, @instance) ->
     super(forge)
+    assert @instance?, 'The argument "instance" must have a value'
 
   resolve: ->
     @instance
