@@ -14,6 +14,7 @@ and probably isn't production-ready just yet.
 - [Multiple bindings for a single component](#multiple-bindings-for-a-single-component)
 - [Conditional bindings and resolution hints](#conditional-bindings-and-resolution-hints)
 - [Lifecycles](#lifecycles)
+- [Unbinding and Rebinding](#unbinding-and-rebinding)
 - [License](#license)
 
 ## Foreward, and forewarning
