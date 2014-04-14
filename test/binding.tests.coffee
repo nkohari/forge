@@ -61,8 +61,8 @@ describe 'Binding', ->
 
     describe 'given one binding: a->instance{Foo}', ->
 
-      instance = new Foo()
       forge = new Forge()
+      instance = new Foo()
       forge.bind('a').to.instance(instance)
 
       it 'should return the bound instance when "a" is requested', ->
@@ -143,5 +143,154 @@ describe 'Binding', ->
       it 'should return an instance of Bar when get() is called for "a" with the correct hint', ->
         a = forge.get('a', 2)
         expect(a).to.be.an.instanceOf(Bar)
+
+#---------------------------------------------------------------------------------------------------
+
+  describe 'Unbinding', ->
+
+    describe 'given one binding: a->type{Foo}', ->
+
+      forge = undefined
+      beforeEach ->
+        forge = new Forge()
+        forge.bind('a').to.type(Foo)
+
+      it 'should return 1 when unbind() is called for "a"', ->
+        result = forge.unbind('a')
+        expect(result).to.equal(1)
+
+      it 'should return 0 when unbind() is called for "b"', ->
+        result = forge.unbind('b')
+        expect(result).to.equal(0)
+
+      it 'should throw an exception if get() is called for "a" after unbinding', ->
+        forge.unbind('a')
+        resolve = -> forge.get('a')
+        expect(resolve).to.throw(ResolutionError)
+
+    describe 'given two bindings: a->type{Foo}, a->type{Bar}', ->
+
+      forge = undefined
+      beforeEach ->
+        forge = new Forge()
+        forge.bind('a').to.type(Foo)
+        forge.bind('a').to.type(Bar)
+
+      it 'should return 2 when unbind() is called for "a"', ->
+        result = forge.unbind('a')
+        expect(result).to.equal(2)
+
+      it 'should return 0 when unbind() is called for "b"', ->
+        result = forge.unbind('b')
+        expect(result).to.equal(0)
+
+      it 'should throw an exception if get() is called for "a" after unbinding', ->
+        forge.unbind('a')
+        resolve = -> forge.get('a')
+        expect(resolve).to.throw(ResolutionError)
+
+    describe 'given two bindings: a->type{Foo}, b->type{Bar}', ->
+
+      forge = undefined
+      beforeEach ->
+        forge = new Forge()
+        forge.bind('a').to.type(Foo)
+        forge.bind('b').to.type(Bar)
+
+      it 'should return 1 when unbind() is called for "a"', ->
+        result = forge.unbind('a')
+        expect(result).to.equal(1)
+
+      it 'should return 1 when unbind() is called for "b"', ->
+        result = forge.unbind('b')
+        expect(result).to.equal(1)
+
+      it 'should throw an exception if get() is called for "a" after unbinding "a"', ->
+        forge.unbind('a')
+        resolve = -> forge.get('a')
+        expect(resolve).to.throw(ResolutionError)
+
+      it 'should return an instance of Bar if get() is called for "b" after unbinding "a"', ->
+        forge.unbind('a')
+        b = forge.get('b')
+        console.log require('util').inspect(forge, 999)
+        expect(b).to.be.an.instanceOf(Bar)
+
+#---------------------------------------------------------------------------------------------------
+
+  describe 'Rebinding', ->
+
+    describe 'given one binding: a->type{Foo}', ->
+
+      forge = undefined
+      beforeEach ->
+        forge = new Forge()
+        forge.bind('a').to.type(Foo)
+
+      describe 'and a rebinding: a->type{Bar}', ->
+        it 'should return an instance of Bar when get() is called for "a"', ->
+          forge.rebind('a').to.type(Bar)
+          a = forge.get('a')
+          expect(a).to.be.an.instanceOf(Bar)
+
+      describe 'and a rebinding: b->type{Bar}', ->
+        it 'should return an instance of Bar when get() is called for "b"', ->
+          forge.rebind('b').to.type(Bar)
+          b = forge.get('b')
+          expect(b).to.be.an.instanceOf(Bar)
+
+    describe 'given two bindings: a->type{Foo} and a->type{Bar}', ->
+
+      forge = undefined
+      beforeEach ->
+        forge = new Forge()
+        forge.bind('a').to.type(Foo)
+        forge.bind('a').to.type(Bar)
+
+      describe 'and a rebinding: a->type{Bar}', ->
+
+        it 'should return an instance of Bar when get() is called for "a"', ->
+          forge.rebind('a').to.type(Bar)
+          a = forge.get('a')
+          expect(a).to.be.an.instanceOf(Bar)
+
+      describe 'and a rebinding: b->type{Bar}', ->
+
+        it 'should return an instance of Bar when get() is called for "b"', ->
+          forge.rebind('b').to.type(Bar)
+          b = forge.get('b')
+          expect(b).to.be.an.instanceOf(Bar)
+
+    describe 'given two bindings: a->type{Foo} and b->type{Bar}', ->
+
+      forge = undefined
+      beforeEach ->
+        forge = new Forge()
+        forge.bind('a').to.type(Foo)
+        forge.bind('b').to.type(Bar)
+
+      describe 'and a rebinding: a->type{Bar}', ->
+
+        it 'should return an instance of Bar when get() is called for "a"', ->
+          forge.rebind('a').to.type(Bar)
+          a = forge.get('a')
+          expect(a).to.be.an.instanceOf(Bar)
+
+        it 'should return an instance of Bar when get() is called for "b"', ->
+          forge.rebind('a').to.type(Bar)
+          b = forge.get('b')
+          expect(b).to.be.an.instanceOf(Bar)
+
+      describe 'and a rebinding: b->type{Bar}', ->
+
+        it 'should return an instance of Foo when get() is called for "a"', ->
+          forge.rebind('b').to.type(Bar)
+          a = forge.get('a')
+          expect(a).to.be.an.instanceOf(Foo)
+        
+        it 'should return an instance of Bar when get() is called for "b"', ->
+          forge.rebind('b').to.type(Bar)
+          b = forge.get('b')
+          expect(b).to.be.an.instanceOf(Bar)
 
 #---------------------------------------------------------------------------------------------------

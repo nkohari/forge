@@ -14,6 +14,17 @@ class Forge
     (@bindings[name] ?= []).push(binding)
     return binding
 
+  unbind: (name) ->
+    assert name?, 'The argument "name" must have a value'
+    count = if @bindings[name]? then @bindings[name].length else 0
+    @bindings[name] = []
+    return count
+
+  rebind: (name) ->
+    assert name?, 'The argumetn "name" must have a value'
+    @unbind(name)
+    return @bind(name)
+
   get: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
     matches = @getMatchingBindings(name, hint)

@@ -207,6 +207,50 @@ foo = forge.get('foo')
 assert(foo.bar !== bar)
 ```
 
+## Unbinding and Rebinding
+
+Forge supports altering bindings after they have been defined via two methods:
+
+1. `unbind()`, which removes any existing binding and does not replace it.
+2. `rebind()`, which removes any existing bindings and begins a new binding definition.
+
+Here's an example of unbinding:
+
+```coffeescript
+Forge = require 'forge-di'
+
+forge = new Forge()
+forge.bind('a').to.type(Foo)
+
+# Returns the number of bindings that were removed.
+count = forge.unbind('a')
+assert(count == 1)
+
+# This will throw a ResolutionError.
+forge.get('a')
+```
+
+And here's an example of rebinding:
+
+```coffeescript
+Forge = require 'forge-di'
+
+forge = new Forge()
+
+forge.bind('a').to.type(Foo)
+a = forge.get(Foo)
+assert(a instanceof Foo)
+
+forge.rebind('a').to.type(Bar)
+a = forge.get('a')
+assert(a instanceof Bar)
+```
+
+*Be careful with unbinding and rebinding!* Treating your container as mutable can make it very
+easy to get into a confusing situation where the bindings between your components are unclear.
+This functionality is primarily provided to make setting up integration tests easier &mdash;
+avoid using it at runtime.
+
 ## License
 
 Copyright &copy; 2014 Nate Kohari.
