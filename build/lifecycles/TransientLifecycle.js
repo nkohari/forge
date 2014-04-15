@@ -15,9 +15,9 @@
       return TransientLifecycle.__super__.constructor.apply(this, arguments);
     }
 
-    TransientLifecycle.prototype.getInstance = function(resolver) {
+    TransientLifecycle.prototype.resolve = function(resolver, args) {
       assert(resolver != null, 'The argument "resolver" must have a value');
-      return resolver.resolve();
+      return resolver.resolve(args);
     };
 
     return TransientLifecycle;

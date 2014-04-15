@@ -29,12 +29,12 @@ class Binding
   matches: (hint) ->
     if @predicate? then @predicate(hint) else true
 
-  resolve: ->
+  resolve: (args = {}) ->
     throw new ConfigurationError(@name, 'No lifecycle defined') unless @lifecycle?
     throw new ConfigurationError(@name, 'No resolver defined') unless @resolver?
     throw new ResolutionError(@name, 'Circular dependencies detected') if @isResolving
     @isResolving = true
-    result = @lifecycle.getInstance(@resolver)
+    result = @lifecycle.resolve(@resolver, args)
     @isResolving = false
     return result
 

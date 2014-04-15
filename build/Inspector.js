@@ -9,11 +9,11 @@
   Inspector = (function() {
     function Inspector() {}
 
-    Inspector.prototype.getNamedDependencies = function(func) {
+    Inspector.prototype.getDependencies = function(func) {
       var hints, params;
       assert(func != null, 'The argument "func" must have a value');
       params = this.getParameterNames(func);
-      hints = this.getHints(func);
+      hints = this.getDependencyHints(func);
       return _.map(params, function(param) {
         var _ref;
         return (_ref = hints[param]) != null ? _ref : param;
@@ -31,7 +31,7 @@
       return matches[1].split(/[,\s]+/);
     };
 
-    Inspector.prototype.getHints = function(func) {
+    Inspector.prototype.getDependencyHints = function(func) {
       var argument, dependency, hint, hints, match, regex;
       assert(func != null, 'The argument "func" must have a value');
       regex = /"(.*?)\s*->\s*(.*?)";/g;

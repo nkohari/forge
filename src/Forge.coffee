@@ -27,36 +27,36 @@ class Forge
     @unbind(name)
     return @bind(name)
 
-  get: (name, hint) ->
+  get: (name, hint, args) ->
     assert name?, 'The argument "name" must have a value'
     bindings = @getMatchingBindings(name, hint)
     if bindings.length == 0
       throw new ResolutionError(name, 'No matching bindings were available')
-    return @resolve(bindings, true)
+    return @resolve(bindings, args, true)
 
-  getOne: (name, hint) ->
+  getOne: (name, hint, args) ->
     assert name?, 'The argument "name" must have a value'
     bindings = @getMatchingBindings(name, hint)
     if bindings.length == 0
       throw new ResolutionError(name, 'No matching bindings were available')
     unless bindings.length == 1
       throw new ResolutionError(name, 'Multiple matching bindings were available')
-    return @resolve(bindings, true)
+    return @resolve(bindings, args, true)
 
-  getAll: (name) ->
+  getAll: (name, args) ->
     assert name?, 'The argument "name" must have a value'
     bindings = @bindings[name]
     unless bindings?.length > 0
       throw new ResolutionError(name, 'No matching bindings were available')
-    return @resolve(bindings, false)
+    return @resolve(bindings, args, false)
 
   getMatchingBindings: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
 
-  resolve: (bindings, unwrap) ->
-    results = _.map bindings, (binding) -> binding.resolve()
+  resolve: (bindings, args, unwrap) ->
+    results = _.map bindings, (binding) -> binding.resolve(args)
     if unwrap and results.length == 1
       return results[0]
     else

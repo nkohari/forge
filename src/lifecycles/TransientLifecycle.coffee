@@ -3,8 +3,8 @@ Lifecycle = require './Lifecycle'
 
 class TransientLifecycle extends Lifecycle
 
-  getInstance: (resolver) ->
+  resolve: (resolver, args) ->
     assert resolver?, 'The argument "resolver" must have a value'
-    return resolver.resolve()
+    return resolver.resolve(args)
 
 module.exports = TransientLifecycle

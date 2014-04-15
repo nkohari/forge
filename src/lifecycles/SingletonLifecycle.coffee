@@ -3,9 +3,9 @@ Lifecycle = require './Lifecycle'
 
 class SingletonLifecycle extends Lifecycle
 
-  getInstance: (resolver) ->
+  resolve: (resolver, args) ->
     assert resolver?, 'The argument "resolver" must have a value'
-    @instance = resolver.resolve() unless @instance?
+    @instance = resolver.resolve(args) unless @instance?
     return @instance
 
 module.exports = SingletonLifecycle

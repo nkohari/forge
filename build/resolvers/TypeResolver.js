@@ -17,12 +17,12 @@
       this.type = type;
       TypeResolver.__super__.constructor.call(this, forge, binding);
       assert(this.type != null, 'The argument "type" must have a value');
-      this.dependencies = this.forge.inspector.getNamedDependencies(this.type);
+      this.dependencies = this.forge.inspector.getDependencies(this.type);
     }
 
-    TypeResolver.prototype.resolve = function() {
-      var args, ctor;
-      args = this.resolveDependencies(this.dependencies);
+    TypeResolver.prototype.resolve = function(args) {
+      var ctor;
+      args = this.resolveDependencies(this.dependencies, args);
       ctor = this.type.bind.apply(this.type, [null].concat(args));
       return new ctor();
     };

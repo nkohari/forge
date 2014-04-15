@@ -15,10 +15,10 @@
       return SingletonLifecycle.__super__.constructor.apply(this, arguments);
     }
 
-    SingletonLifecycle.prototype.getInstance = function(resolver) {
+    SingletonLifecycle.prototype.resolve = function(resolver, args) {
       assert(resolver != null, 'The argument "resolver" must have a value');
       if (this.instance == null) {
-        this.instance = resolver.resolve();
+        this.instance = resolver.resolve(args);
       }
       return this.instance;
     };

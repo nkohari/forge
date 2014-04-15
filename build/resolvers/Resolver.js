@@ -14,18 +14,18 @@
       assert(this.binding != null, 'The argument "binding" must have a value');
     }
 
-    Resolver.prototype.resolve = function() {
+    Resolver.prototype.resolve = function(args) {
       throw new Error("You must implement resolve() on " + this.constructor.name);
     };
 
-    Resolver.prototype.resolveDependencies = function(names) {
+    Resolver.prototype.resolveDependencies = function(names, args) {
       return _.map(names, (function(_this) {
         return function(name) {
-          var _ref;
+          var _ref, _ref1;
           if (name === 'forge') {
             return _this.forge;
           }
-          return (_ref = _this.binding["arguments"][name]) != null ? _ref : _this.forge.get(name);
+          return (_ref = (_ref1 = args[name]) != null ? _ref1 : _this.binding["arguments"][name]) != null ? _ref : _this.forge.get(name);
         };
       })(this));
     };

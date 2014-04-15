@@ -325,21 +325,21 @@ describe 'Binding', ->
 
 #---------------------------------------------------------------------------------------------------
 
-  describe 'Explicit Arguments', ->
+  describe 'Argument overrides', ->
 
-    describe 'given one binding, a->type{DependsOnFoo}, with an explicit argument', ->
+    describe 'given one binding, a->type{DependsOnFoo}, with an argument override', ->
 
       expectedDependency = new Foo()
 
       forge = new Forge()
       forge.bind('a').to.type(DependsOnFoo).with(foo: expectedDependency)
 
-      it 'should inject the explicit argument into the constructor', ->
+      it 'should inject the overridden argument into the constructor', ->
         a = forge.get('a')
         expect(a).to.be.an.instanceOf(DependsOnFoo)
         expect(a.foo).to.equal(expectedDependency)
 
-    describe 'given one binding, a->function, with an explicit argument', ->
+    describe 'given one binding, a->function, with an argument override', ->
 
       expectedDependency = new Foo()
       argumentReceived = undefined
@@ -350,13 +350,13 @@ describe 'Binding', ->
       forge = new Forge()
       forge.bind('a').to.function(resolve).with(foo: expectedDependency)
 
-      it 'should pass the explicit argument to the function', ->
+      it 'should pass the overridden argument to the function', ->
         a = forge.get('a')
         expect(argumentReceived).to.equal(expectedDependency)
         expect(a).to.be.an.instanceOf(DependsOnFoo)
         expect(a.foo).to.equal(expectedDependency)
 
-    describe 'given one binding, a->function, with a dependency hint and an explicit argument', ->
+    describe 'given one binding, a->function, with a dependency hint and an argument override', ->
 
       expectedDependency = new Foo()
       argumentReceived = undefined
@@ -368,7 +368,7 @@ describe 'Binding', ->
       forge = new Forge()
       forge.bind('a').to.function(resolve).with(foo: expectedDependency)
 
-      it 'should pass the explicit argument to the function', ->
+      it 'should pass the overridden argument to the function', ->
         a = forge.get('a')
         expect(argumentReceived).to.equal(expectedDependency)
         expect(a).to.be.an.instanceOf(DependsOnFoo)

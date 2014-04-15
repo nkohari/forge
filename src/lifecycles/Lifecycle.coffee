@@ -1,6 +1,6 @@
 class Lifecycle
 
-  getInstance: (resolver) ->
-    throw new Error("You must implement getInstance() on #{@constructor.name}")
+  resolve: (resolver) ->
+    throw new Error("You must implement resolve() on #{@constructor.name}")
 
 module.exports = Lifecycle

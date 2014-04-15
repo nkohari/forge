@@ -19,7 +19,7 @@
       assert(this.instance != null, 'The argument "instance" must have a value');
     }
 
-    InstanceResolver.prototype.resolve = function() {
+    InstanceResolver.prototype.resolve = function(args) {
       return this.instance;
     };
 

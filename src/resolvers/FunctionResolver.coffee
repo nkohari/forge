@@ -7,10 +7,10 @@ class FunctionResolver extends Resolver
   constructor: (forge, binding, @func) ->
     super(forge, binding)
     assert @func?, 'The argument "func" must have a value'
-    @dependencies = @forge.inspector.getNamedDependencies(@func)
+    @dependencies = @forge.inspector.getDependencies(@func)
 
-  resolve: ->
-    args = @resolveDependencies(@dependencies)
+  resolve: (args) ->
+    args = @resolveDependencies(@dependencies, args)
     @func.apply(null, args)
 
   toString: ->

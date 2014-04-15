@@ -5,8 +5,8 @@
   Lifecycle = (function() {
     function Lifecycle() {}
 
-    Lifecycle.prototype.getInstance = function(resolver) {
-      throw new Error("You must implement getInstance() on " + this.constructor.name);
+    Lifecycle.prototype.resolve = function(resolver) {
+      throw new Error("You must implement resolve() on " + this.constructor.name);
     };
 
     return Lifecycle;

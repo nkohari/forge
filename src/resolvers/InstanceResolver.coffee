@@ -8,7 +8,7 @@ class InstanceResolver extends Resolver
     super(forge, binding)
     assert @instance?, 'The argument "instance" must have a value'
 
-  resolve: ->
+  resolve: (args) ->
     @instance
 
   toString: ->

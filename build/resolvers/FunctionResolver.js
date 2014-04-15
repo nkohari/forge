@@ -17,12 +17,11 @@
       this.func = func;
       FunctionResolver.__super__.constructor.call(this, forge, binding);
       assert(this.func != null, 'The argument "func" must have a value');
-      this.dependencies = this.forge.inspector.getNamedDependencies(this.func);
+      this.dependencies = this.forge.inspector.getDependencies(this.func);
     }
 
-    FunctionResolver.prototype.resolve = function() {
-      var args;
-      args = this.resolveDependencies(this.dependencies);
+    FunctionResolver.prototype.resolve = function(args) {
+      args = this.resolveDependencies(this.dependencies, args);
       return this.func.apply(null, args);
     };
 

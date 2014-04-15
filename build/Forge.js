@@ -40,17 +40,17 @@
       return this.bind(name);
     };
 
-    Forge.prototype.get = function(name, hint) {
+    Forge.prototype.get = function(name, hint, args) {
       var bindings;
       assert(name != null, 'The argument "name" must have a value');
       bindings = this.getMatchingBindings(name, hint);
       if (bindings.length === 0) {
         throw new ResolutionError(name, 'No matching bindings were available');
       }
-      return this.resolve(bindings, true);
+      return this.resolve(bindings, args, true);
     };
 
-    Forge.prototype.getOne = function(name, hint) {
+    Forge.prototype.getOne = function(name, hint, args) {
       var bindings;
       assert(name != null, 'The argument "name" must have a value');
       bindings = this.getMatchingBindings(name, hint);
@@ -60,17 +60,17 @@
       if (bindings.length !== 1) {
         throw new ResolutionError(name, 'Multiple matching bindings were available');
       }
-      return this.resolve(bindings, true);
+      return this.resolve(bindings, args, true);
     };
 
-    Forge.prototype.getAll = function(name) {
+    Forge.prototype.getAll = function(name, args) {
       var bindings;
       assert(name != null, 'The argument "name" must have a value');
       bindings = this.bindings[name];
       if (!((bindings != null ? bindings.length : void 0) > 0)) {
         throw new ResolutionError(name, 'No matching bindings were available');
       }
-      return this.resolve(bindings, false);
+      return this.resolve(bindings, args, false);
     };
 
     Forge.prototype.getMatchingBindings = function(name, hint) {
@@ -83,10 +83,10 @@
       });
     };
 
-    Forge.prototype.resolve = function(bindings, unwrap) {
+    Forge.prototype.resolve = function(bindings, args, unwrap) {
       var results;
       results = _.map(bindings, function(binding) {
-        return binding.resolve();
+        return binding.resolve(args);
       });
       if (unwrap && results.length === 1) {
         return results[0];

@@ -57,8 +57,11 @@
       }
     };
 
-    Binding.prototype.resolve = function() {
+    Binding.prototype.resolve = function(args) {
       var result;
+      if (args == null) {
+        args = {};
+      }
       if (this.lifecycle == null) {
         throw new ConfigurationError(this.name, 'No lifecycle defined');
       }
@@ -69,7 +72,7 @@
         throw new ResolutionError(this.name, 'Circular dependencies detected');
       }
       this.isResolving = true;
-      result = this.lifecycle.getInstance(this.resolver);
+      result = this.lifecycle.resolve(this.resolver, args);
       this.isResolving = false;
       return result;
     };

@@ -3,10 +3,10 @@ _      = require 'underscore'
 
 class Inspector
 
-  getNamedDependencies: (func) ->
+  getDependencies: (func) ->
     assert func?, 'The argument "func" must have a value'
     params = @getParameterNames(func)
-    hints  = @getHints(func)
+    hints  = @getDependencyHints(func)
     return _.map params, (param) -> hints[param] ? param
 
   getParameterNames: (func) ->
@@ -16,7 +16,7 @@ class Inspector
     return [] if !matches? or matches[1].length == 0
     return matches[1].split /[,\s]+/
 
-  getHints: (func) ->
+  getDependencyHints: (func) ->
     assert func?, 'The argument "func" must have a value'
     regex = /"(.*?)\s*->\s*(.*?)";/g
     hints = {}
