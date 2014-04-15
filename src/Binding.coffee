@@ -22,7 +22,8 @@ class Binding
   constructor: (@forge, @name) ->
     assert @forge?, 'The argument "forge" must have a value'
     assert @name?,  'The argument "name" must have a value'
-    @lifecycle = new SingletonLifecycle() # default
+    @lifecycle   = new SingletonLifecycle() # default
+    @arguments   = {}
     @isResolving = false
 
   matches: (hint) ->
@@ -42,15 +43,15 @@ class Binding
 
   type: chain (target) ->
     assert target?, 'The argument "target" must have a value'
-    @resolver = new TypeResolver(@forge, target)
+    @resolver = new TypeResolver(@forge, this, target)
 
   function: chain (target) ->
     assert target?, 'The argument "target" must have a value'
-    @resolver = new FunctionResolver(@forge, target)
+    @resolver = new FunctionResolver(@forge, this, target)
 
   instance: chain (target) ->
     assert target?, 'The argument "target" must have a value'
-    @resolver = new InstanceResolver(@forge, target)
+    @resolver = new InstanceResolver(@forge, this, target)
 
   singleton: chain ->
     @lifecycle = new SingletonLifecycle()
@@ -58,9 +59,15 @@ class Binding
   transient: chain ->
     @lifecycle = new TransientLifecycle()
 
-  when: chain (predicate) ->
-    assert predicate?, 'The argument "predicate" must have a value'
-    @predicate = predicate
+  when: chain (condition) ->
+    assert condition?, 'The argument "condition" must have a value'
+    if _.isFunction(condition)
+      @predicate = condition
+    else
+      @predicate = (hint) -> hint == condition
+
+  with: chain (args) ->
+    @arguments = args
 
   toString: ->
     tokens = [@name]

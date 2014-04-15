@@ -2,8 +2,9 @@ assert = require 'assert'
 
 class Resolver
 
-  constructor: (@forge) ->
-    assert @forge?, 'The argument "forge" must have a value'
+  constructor: (@forge, @binding) ->
+    assert @forge?,   'The argument "forge" must have a value'
+    assert @binding?, 'The argument "binding" must have a value'
 
   resolve: ->
     throw new Error("You must implement resolve() on #{@constructor.name}")

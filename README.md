@@ -14,6 +14,7 @@ and probably isn't production-ready just yet.
 - [Multiple bindings for a single component](#multiple-bindings-for-a-single-component)
 - [Conditional bindings and resolution hints](#conditional-bindings-and-resolution-hints)
 - [Lifecycles](#lifecycles)
+- [Explicit arguments](#explicit-arguments)
 - [Unbinding and Rebinding](#unbinding-and-rebinding)
 - [License](#license)
 
@@ -71,6 +72,33 @@ assert(obj.bar instanceof Bar)
 Forge works by examining the names of the constructor parameters on your types. In the example above,
 the constructor of the class `Foo` had a parameter called `bar`. Forge sees this as a dependency,
 resolves the component named `bar` and passes the resolved instance to the constructor of `Foo`.
+
+Instead of constructors, you can also bind to functions, which Forge will call to resolve
+the dependency. (This is helpful if you need to do something more manual to resolve the dependency.)
+If the function has any parameters, Forge will attempt to resolve them when calling the function.
+
+```coffeescript
+Forge = require 'forge-di'
+
+class Foo
+  constructor: (@bar) ->
+
+class Bar
+  constructor: ->
+
+# A simple factory function with a single dependency
+createFoo = (bar) -> new Foo(bar)
+
+# Declare a binding to the function, and another to the dependency it requires
+forge = new Forge()
+forge.bind('foo').to.function(createFoo)
+forge.bind('bar').to.type(Bar)
+
+# Forge will call the function
+foo = forge.get('foo')
+assert(foo instanceof Foo)
+assert(foo.bar instanceof Bar)
+```
 
 ## Dependency hints
 
@@ -143,7 +171,11 @@ class BlueFoo
 
 # Register multiple bindings to the same component, with predicates
 forge = new Forge()
-forge.bind('foo').to.type(RedFoo).when (hint) -> hint == 'red'
+
+# Here's the short form, which just does an equality (==) check against the hint:
+forge.bind('foo').to.type(RedFoo).when('red')
+
+# And here's the long form, which allows you to pass in a predicate function:
 forge.bind('foo').to.type(BlueFoo).when (hint) -> hint == 'blue'
 
 # Forge passes the resolution hint to the bindings' predicates to determine which to resolve
@@ -153,7 +185,11 @@ assert(foo1 instanceof RedFoo)
 assert(foo2 instanceof BlueFoo)
 ```
 
+Hints don't need to be scalars; they can be anything you want, as long as the predicates
+associated with your conditional bindings understand how to evaluate them.
+
 If multiple bindings match, `Forge.get()` will return an array of results.
+(See [Multiple Bindings for a Single Component](#multiple-bindings-for-a-single-component) above.)
 
 ## Lifecycles
 
@@ -208,6 +244,61 @@ foo = forge.get('foo')
 assert(foo.bar !== bar)
 ```
 
+## Explicit arguments
+
+Rather than allowing Forge to figure everything out for you, sometimes you may want
+to take manual control over part of the dependency resolution process. To allow this,
+Forge lets you supply *explicit arguments* to your bindings, overriding dependencies
+by name.
+
+Here's an example:
+
+```coffeescript
+Forge = require 'forge-di'
+
+# A class with a single dependency
+class Foo
+  constructor: (@bar) ->
+
+# Manually create an instance of the dependency
+manuallyCreatedBar = new Bar()
+
+# Tell the binding when "bar" is requested, just return the instance we just manually created.
+forge = new Forge()
+forge.bind('foo').to.type(Foo).with(bar: manuallyCreatedBar)
+
+# Forge will pass the explicit argument to the constructor of Foo
+foo = forge.get('foo')
+assert(foo instanceof Foo)
+assert(foo.bar === manuallyCreatedBar)
+```
+
+You can also use this to specify arguments to bound functions. This is helpful to create
+factory functions if you need them:
+
+```coffeescript
+Forge = require 'forge-di'
+
+# A factory function with a single argument
+create = (bar) -> new Foo(bar)
+
+# Manually create an instance of the dependency
+manuallyCreatedBar = new Bar()
+
+# Explicitly set the value for the parameter named "bar"
+forge = new Forge()
+forge.bind('foo').to.function(createFoo).with(bar: manuallyCreatedBar)
+
+# Forge will pass the explicit argument to the function.
+foo = forge.get()
+assert(foo instanceof Foo)
+assert(foo.bar === manuallyCreatedBar)
+```
+
+Note: if (for some reason) you specify a [dependency hint](#dependency-hints) on one of
+the arguments to a constructor or function, the explicit argument name must match the
+*hinted name*, not the *actual name* of the argument.
+
 ## Unbinding and Rebinding
 
 Forge supports altering bindings after they have been defined via two methods:
@@ -219,6 +310,9 @@ Here's an example of unbinding:
 
 ```coffeescript
 Forge = require 'forge-di'
+
+class Foo
+  constructor: ->
 
 forge = new Forge()
 forge.bind('a').to.type(Foo)
@@ -235,6 +329,12 @@ And here's an example of rebinding:
 
 ```coffeescript
 Forge = require 'forge-di'
+
+class Foo
+  constructor: ->
+
+class Bar
+  constructor: ->
 
 forge = new Forge()
 

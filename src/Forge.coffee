@@ -1,12 +1,14 @@
 assert          = require 'assert'
 _               = require 'underscore'
 Binding         = require './Binding'
+Inspector       = require './Inspector'
 ResolutionError = require './errors/ResolutionError'
 
 class Forge
 
-  constructor: ->
-    @bindings = {}
+  constructor: (inspector) ->
+    @bindings  = {}
+    @inspector = inspector ? new Inspector()
 
   bind: (name) ->
     assert name?, 'The argument "name" must have a value'

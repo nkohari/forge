@@ -126,7 +126,25 @@ describe 'Binding', ->
 
   describe 'Conditional bindings and resolution hints', ->
 
-    describe 'given two conditional bindings: a?->type{Foo} and a?->type{Bar}', ->
+    describe 'given two conditional bindings: a?->type{Foo} and a?->type{Bar}, using equality conditions', ->
+
+      forge = new Forge()
+      forge.bind('a').to.type(Foo).when(1)
+      forge.bind('a').to.type(Bar).when(2)
+
+      it 'should throw an exception if get() is called for "a" with no resolution hint', ->
+        resolve = -> forge.get('a')
+        expect(resolve).to.throw(ResolutionError)
+
+      it 'should return an instance of Foo when get() is called for "a" with the correct hint', ->
+        a = forge.get('a', 1)
+        expect(a).to.be.an.instanceOf(Foo)
+
+      it 'should return an instance of Bar when get() is called for "a" with the correct hint', ->
+        a = forge.get('a', 2)
+        expect(a).to.be.an.instanceOf(Bar)
+
+    describe 'given two conditional bindings: a?->type{Foo} and a?->type{Bar}, using explicit predicates', ->
 
       forge = new Forge()
       forge.bind('a').to.type(Foo).when (hint) -> hint == 1
@@ -292,5 +310,56 @@ describe 'Binding', ->
           forge.rebind('b').to.type(Bar)
           b = forge.get('b')
           expect(b).to.be.an.instanceOf(Bar)
+
+#---------------------------------------------------------------------------------------------------
+
+  describe 'Explicit Arguments', ->
+
+    describe 'given one binding, a->type{DependsOnFoo}, with an explicit argument', ->
+
+      expectedDependency = new Foo()
+
+      forge = new Forge()
+      forge.bind('a').to.type(DependsOnFoo).with(foo: expectedDependency)
+
+      it 'should inject the explicit argument into the constructor', ->
+        a = forge.get('a')
+        expect(a).to.be.an.instanceOf(DependsOnFoo)
+        expect(a.foo).to.equal(expectedDependency)
+
+    describe 'given one binding, a->function, with an explicit argument', ->
+
+      expectedDependency = new Foo()
+      argumentReceived = undefined
+      resolve = (foo) ->
+        argumentReceived = foo
+        new DependsOnFoo(foo)
+
+      forge = new Forge()
+      forge.bind('a').to.function(resolve).with(foo: expectedDependency)
+
+      it 'should pass the explicit argument to the function', ->
+        a = forge.get('a')
+        expect(argumentReceived).to.equal(expectedDependency)
+        expect(a).to.be.an.instanceOf(DependsOnFoo)
+        expect(a.foo).to.equal(expectedDependency)
+
+    describe 'given one binding, a->function, with a dependency hint and an explicit argument', ->
+
+      expectedDependency = new Foo()
+      argumentReceived = undefined
+      resolve = (arg) ->
+        "arg->foo"
+        argumentReceived = arg
+        new DependsOnFoo(arg)
+
+      forge = new Forge()
+      forge.bind('a').to.function(resolve).with(foo: expectedDependency)
+
+      it 'should pass the explicit argument to the function', ->
+        a = forge.get('a')
+        expect(argumentReceived).to.equal(expectedDependency)
+        expect(a).to.be.an.instanceOf(DependsOnFoo)
+        expect(a.foo).to.equal(expectedDependency)
 
 #---------------------------------------------------------------------------------------------------

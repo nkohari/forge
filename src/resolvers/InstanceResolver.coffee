@@ -4,8 +4,8 @@ Resolver = require './Resolver'
 
 class InstanceResolver extends Resolver
 
-  constructor: (forge, @instance) ->
-    super(forge)
+  constructor: (forge, binding, @instance) ->
+    super(forge, binding)
     assert @instance?, 'The argument "instance" must have a value'
 
   resolve: ->
