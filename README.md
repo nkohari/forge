@@ -149,9 +149,14 @@ assert(facade.plugins[1] instanceof PluginTwo)
 ```
 
 To support this behavior, `Forge.get()` will return a single instance when only one matching
-binding is available, and an array of instances when multiple bindings are available. To be
-certain that you only resolve a single instance, you can call `Forge.getOne()` instead.
+binding is available, and an array of instances when multiple bindings are available.
+
+To be certain that you only resolve a single instance, you can call `Forge.getOne()` instead.
 This function will throw an exception if more than one matching binding would be resolved.
+
+If, instead, you want to resolve *all* bindings for a given component, you can call `Forge.getAll()`.
+This will ignore the conditions specified on the bindings, and resolve all of them. This
+function will always return an array of instances, even if only a single instance was resolved.
 
 ## Conditional bindings and resolution hints
 
@@ -298,6 +303,31 @@ assert(foo.bar === manuallyCreatedBar)
 Note: if (for some reason) you specify a [dependency hint](#dependency-hints) on one of
 the arguments to a constructor or function, the explicit argument name must match the
 *hinted name*, not the *actual name* of the argument.
+
+## Dependencies on the Forge itself
+
+Sometimes, you might want your components to do on-demand resolution of dependencies,
+rather than having them injected immediately when the component is created. To do this,
+you can create a factory type, or you can just ask Forge to pass a reference of itself
+to the created component.
+
+Here's an example of a dependency on the Forge itself:
+
+```coffeescript
+Forge = require 'forge-di'
+
+class DependsOnForge
+  constructor: (@forge) ->
+
+forge = new Forge()
+forge.bind('dependent').to.type(DependsOnForge)
+
+obj = forge.get('dependent')
+assert(obj instanceof DependsOnForge)
+assert(obj.forge === forge)
+```
+
+*Use this sparingly!* You should always favor constructor injection to service location.
 
 ## Unbinding and Rebinding
 

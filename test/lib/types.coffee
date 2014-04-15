@@ -12,6 +12,9 @@ class TypeWithBindingHints
     "dep1->a"
     "dep2->b"
 
+class DependsOnForge
+  constructor: (@forge) ->
+
 class CircularA
   constructor: (@b) ->
 
@@ -23,6 +26,7 @@ module.exports = {
   Bar
   DependsOnFoo
   TypeWithBindingHints
+  DependsOnForge
   CircularA
   CircularB
 }

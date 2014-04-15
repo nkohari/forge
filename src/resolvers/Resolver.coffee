@@ -1,4 +1,5 @@
 assert = require 'assert'
+_      = require 'underscore'
 
 class Resolver
 
@@ -8,5 +9,10 @@ class Resolver
 
   resolve: ->
     throw new Error("You must implement resolve() on #{@constructor.name}")
+
+  resolveDependencies: (names) ->
+    _.map names, (name) =>
+      return @forge if name is 'forge'
+      return @binding.arguments[name] ? @forge.get(name)
 
 module.exports = Resolver

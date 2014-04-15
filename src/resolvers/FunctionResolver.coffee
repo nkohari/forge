@@ -10,7 +10,7 @@ class FunctionResolver extends Resolver
     @dependencies = @forge.inspector.getNamedDependencies(@func)
 
   resolve: ->
-    args = _.map @dependencies, (name) => @binding.arguments[name]
+    args = @resolveDependencies(@dependencies)
     @func.apply(null, args)
 
   toString: ->

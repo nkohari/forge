@@ -2,7 +2,7 @@ expect          = require('chai').expect
 Forge           = require '../src/Forge'
 ResolutionError = require '../src/errors/ResolutionError'
 
-{Foo, Bar, DependsOnFoo, TypeWithBindingHints} = require './lib/types'
+{Foo, Bar, DependsOnFoo, TypeWithBindingHints, DependsOnForge} = require './lib/types'
 
 describe 'Binding', ->
 
@@ -144,6 +144,12 @@ describe 'Binding', ->
         a = forge.get('a', 2)
         expect(a).to.be.an.instanceOf(Bar)
 
+      it 'should return an array of an instance of Foo and Bar when getAll() is called for "a"', ->
+        results = forge.getAll('a')
+        expect(results.length).to.equal(2)
+        expect(results[0]).to.be.an.instanceOf(Foo)
+        expect(results[1]).to.be.an.instanceOf(Bar)
+
     describe 'given two conditional bindings: a?->type{Foo} and a?->type{Bar}, using explicit predicates', ->
 
       forge = new Forge()
@@ -161,6 +167,12 @@ describe 'Binding', ->
       it 'should return an instance of Bar when get() is called for "a" with the correct hint', ->
         a = forge.get('a', 2)
         expect(a).to.be.an.instanceOf(Bar)
+
+      it 'should return an array of an instance of Foo and Bar when getAll() is called for "a"', ->
+        results = forge.getAll('a')
+        expect(results.length).to.equal(2)
+        expect(results[0]).to.be.an.instanceOf(Foo)
+        expect(results[1]).to.be.an.instanceOf(Bar)
 
 #---------------------------------------------------------------------------------------------------
 
@@ -361,5 +373,19 @@ describe 'Binding', ->
         expect(argumentReceived).to.equal(expectedDependency)
         expect(a).to.be.an.instanceOf(DependsOnFoo)
         expect(a.foo).to.equal(expectedDependency)
+
+#---------------------------------------------------------------------------------------------------
+
+  describe 'Dependencies on the Forge', ->
+
+    describe 'given a binding, a->type{DependsOnForge}', ->
+
+      forge = new Forge()
+      forge.bind('a').to.type(DependsOnForge)
+        
+      it 'should inject the Forge when get() is called for "a"', ->
+        a = forge.get('a')
+        expect(a).to.be.an.instanceOf(DependsOnForge)
+        expect(a.forge).to.equal(forge)
 
 #---------------------------------------------------------------------------------------------------

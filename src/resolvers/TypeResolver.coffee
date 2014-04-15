@@ -10,7 +10,7 @@ class TypeResolver extends Resolver
     @dependencies = @forge.inspector.getNamedDependencies(@type)
 
   resolve: ->
-    args = _.map @dependencies, (name) => @binding.arguments[name] ? @forge.get(name)
+    args = @resolveDependencies(@dependencies)
     ctor = @type.bind.apply(@type, [null].concat(args))
     return new ctor()
 

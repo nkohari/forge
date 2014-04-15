@@ -29,25 +29,38 @@ class Forge
 
   get: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
-    matches = @getMatchingBindings(name, hint)
-    if matches.length == 0
+    bindings = @getMatchingBindings(name, hint)
+    if bindings.length == 0
       throw new ResolutionError(name, 'No matching bindings were available')
-    results = _.map matches, (binding) -> binding.resolve()
-    return if results.length == 1 then results[0] else results
+    return @resolve(bindings, true)
 
   getOne: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
-    matches = @getMatchingBindings(name, hint)
-    if matches.length == 0
+    bindings = @getMatchingBindings(name, hint)
+    if bindings.length == 0
       throw new ResolutionError(name, 'No matching bindings were available')
-    unless matches.length == 1
+    unless bindings.length == 1
       throw new ResolutionError(name, 'Multiple matching bindings were available')
-    return matches[0].resolve()
+    return @resolve(bindings, true)
+
+  getAll: (name) ->
+    assert name?, 'The argument "name" must have a value'
+    bindings = @bindings[name]
+    unless bindings?.length > 0
+      throw new ResolutionError(name, 'No matching bindings were available')
+    return @resolve(bindings, false)
 
   getMatchingBindings: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
+
+  resolve: (bindings, unwrap) ->
+    results = _.map bindings, (binding) -> binding.resolve()
+    if unwrap and results.length == 1
+      return results[0]
+    else
+      return results
 
   inspect: ->
     bindings = _.flatten _.values(@bindings)
