@@ -25,4 +25,10 @@ class Inspector
       hints[argument] = dependency
     return hints
 
+  isAutoConstructor: (constructor) ->
+    assert constructor?, 'The argument "constructor" must have a value'
+    name = constructor.name
+    body = constructor.toString()
+    return body.indexOf("#{name}.__super__.constructor.apply(this, arguments);") > 0
+
 module.exports = Inspector

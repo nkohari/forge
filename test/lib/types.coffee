@@ -21,6 +21,19 @@ class CircularA
 class CircularB
   constructor: (@a) ->
 
+class Parent
+  constructor: (@foo) ->
+
+class ChildWithAutoConstructor extends Parent
+
+class ChildWithExplicitConstructor extends Parent
+  constructor: (foo, @bar) ->
+    super(foo)
+
+class ChildOfChildWithAutoConstructor extends ChildWithAutoConstructor
+
+class ChildOfChildWithExplicitConstructor extends ChildWithExplicitConstructor
+
 module.exports = {
   Foo
   Bar
@@ -29,4 +42,9 @@ module.exports = {
   DependsOnForge
   CircularA
   CircularB
+  Parent
+  ChildWithAutoConstructor
+  ChildWithExplicitConstructor
+  ChildOfChildWithAutoConstructor
+  ChildOfChildWithExplicitConstructor
 }
