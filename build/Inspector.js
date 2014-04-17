@@ -43,6 +43,14 @@
       return hints;
     };
 
+    Inspector.prototype.isAutoConstructor = function(constructor) {
+      var body, name;
+      assert(constructor != null, 'The argument "constructor" must have a value');
+      name = constructor.name;
+      body = constructor.toString();
+      return body.indexOf("" + name + ".__super__.constructor.apply(this, arguments);") > 0;
+    };
+
     return Inspector;
 
   })();

@@ -14,10 +14,12 @@
     __extends(TypeResolver, _super);
 
     function TypeResolver(forge, binding, type) {
+      var constructor;
       this.type = type;
       TypeResolver.__super__.constructor.call(this, forge, binding);
       assert(this.type != null, 'The argument "type" must have a value');
-      this.dependencies = this.forge.inspector.getDependencies(this.type);
+      constructor = this.findConstructorToInspect(this.type);
+      this.dependencies = this.forge.inspector.getDependencies(constructor);
     }
 
     TypeResolver.prototype.resolve = function(args) {
@@ -25,6 +27,15 @@
       args = this.resolveDependencies(this.dependencies, args);
       ctor = this.type.bind.apply(this.type, [null].concat(args));
       return new ctor();
+    };
+
+    TypeResolver.prototype.findConstructorToInspect = function(type) {
+      var constructor;
+      constructor = type;
+      while (this.forge.inspector.isAutoConstructor(constructor)) {
+        constructor = constructor.__super__.constructor;
+      }
+      return constructor;
     };
 
     TypeResolver.prototype.toString = function() {
