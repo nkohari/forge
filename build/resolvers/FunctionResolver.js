@@ -20,8 +20,8 @@
       this.dependencies = this.forge.inspector.getDependencies(this.func);
     }
 
-    FunctionResolver.prototype.resolve = function(args) {
-      args = this.resolveDependencies(this.dependencies, args);
+    FunctionResolver.prototype.resolve = function(context, args) {
+      args = this.resolveDependencies(context, this.dependencies, args);
       return this.func.apply(null, args);
     };
 

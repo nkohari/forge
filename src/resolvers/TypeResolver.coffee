@@ -10,8 +10,8 @@ class TypeResolver extends Resolver
     constructor   = @findConstructorToInspect(@type)
     @dependencies = @forge.inspector.getDependencies(constructor)
 
-  resolve: (args) ->
-    args = @resolveDependencies(@dependencies, args)
+  resolve: (context, args) ->
+    args = @resolveDependencies(context, @dependencies, args)
     ctor = @type.bind.apply(@type, [null].concat(args))
     return new ctor()
 

@@ -15,9 +15,14 @@
       return TransientLifecycle.__super__.constructor.apply(this, arguments);
     }
 
-    TransientLifecycle.prototype.resolve = function(resolver, args) {
+    TransientLifecycle.prototype.resolve = function(resolver, context, args) {
       assert(resolver != null, 'The argument "resolver" must have a value');
-      return resolver.resolve(args);
+      assert(context != null, 'The argument "context" must have a value');
+      return resolver.resolve(context, args);
+    };
+
+    TransientLifecycle.prototype.toString = function() {
+      return 'transient';
     };
 
     return TransientLifecycle;

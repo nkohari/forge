@@ -17,22 +17,22 @@
       this.instance = instance;
       InstanceResolver.__super__.constructor.call(this, forge, binding);
       assert(this.instance != null, 'The argument "instance" must have a value');
+      this.dependencies = [];
     }
 
-    InstanceResolver.prototype.resolve = function(args) {
+    InstanceResolver.prototype.resolve = function(context, args) {
       return this.instance;
     };
 
     InstanceResolver.prototype.toString = function() {
-      var str, _ref;
+      var _ref;
       if (this.instance == null) {
-        str = '?';
+        return '<unknown instance>';
       } else if (((_ref = this.instance.constructor) != null ? _ref.name : void 0) != null) {
-        str = "" + this.instance.constructor.name;
+        return "an instance of " + this.instance.constructor.name;
       } else {
-        str = typeof this.instance;
+        return "an instance of " + (typeof this.instance);
       }
-      return "instance{" + str + "}";
     };
 
     return InstanceResolver;

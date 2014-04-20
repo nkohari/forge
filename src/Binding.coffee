@@ -22,20 +22,23 @@ class Binding
   constructor: (@forge, @name) ->
     assert @forge?, 'The argument "forge" must have a value'
     assert @name?,  'The argument "name" must have a value'
-    @lifecycle   = new SingletonLifecycle() # default
-    @arguments   = {}
-    @isResolving = false
+    @lifecycle = new SingletonLifecycle() # default
+    @arguments = {}
 
   matches: (hint) ->
     if @predicate? then @predicate(hint) else true
 
-  resolve: (args = {}) ->
-    throw new ConfigurationError(@name, 'No lifecycle defined') unless @lifecycle?
-    throw new ConfigurationError(@name, 'No resolver defined') unless @resolver?
-    throw new ResolutionError(@name, 'Circular dependencies detected') if @isResolving
-    @isResolving = true
-    result = @lifecycle.resolve(@resolver, args)
-    @isResolving = false
+  resolve: (context, args = {}) ->
+    assert context, 'The argument "context" must have a value'
+    unless @lifecycle?
+      throw new ConfigurationError(@name, 'No lifecycle defined')
+    unless @resolver?
+      throw new ConfigurationError(@name, 'No resolver defined')
+    if context.has(this)
+      throw new ResolutionError(@name, context, 'Circular dependencies detected')
+    context.push(this)
+    result = @lifecycle.resolve(@resolver, context, args)
+    context.pop()
     return result
 
   sweeten(this, 'to')
@@ -70,13 +73,14 @@ class Binding
     @arguments = args
 
   toString: ->
-    tokens = [@name]
-    tokens.push '?' if @predicate?
+    tokens = []
+    tokens.push '(conditional)' if @predicate?
+    tokens.push @name
     tokens.push '->'
-    if @resolver?
-      tokens.push @resolver.toString()
-    else
-      tokens.push '?'
-    return tokens.join('')
+    tokens.push if @resolver? then @resolver.toString() else '<undefined resolver>'
+    tokens.push "(#{@lifecycle.toString()})"
+    if @resolver.dependencies?.length > 0
+      tokens.push "depends on: [#{@resolver.dependencies.join(', ')}]"
+    tokens.join(' ')
 
 module.exports = Binding

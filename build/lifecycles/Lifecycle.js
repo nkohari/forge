@@ -5,7 +5,7 @@
   Lifecycle = (function() {
     function Lifecycle() {}
 
-    Lifecycle.prototype.resolve = function(resolver) {
+    Lifecycle.prototype.resolve = function(resolver, context, args) {
       throw new Error("You must implement resolve() on " + this.constructor.name);
     };
 

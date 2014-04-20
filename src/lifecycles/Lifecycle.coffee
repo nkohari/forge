@@ -1,6 +1,6 @@
 class Lifecycle
 
-  resolve: (resolver) ->
+  resolve: (resolver, context, args) ->
     throw new Error("You must implement resolve() on #{@constructor.name}")
 
 module.exports = Lifecycle

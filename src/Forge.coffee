@@ -1,14 +1,14 @@
 assert          = require 'assert'
 _               = require 'underscore'
 Binding         = require './Binding'
+Context         = require './Context'
 Inspector       = require './Inspector'
 ResolutionError = require './errors/ResolutionError'
 
 class Forge
 
-  constructor: (inspector) ->
-    @bindings  = {}
-    @inspector = inspector ? new Inspector()
+  constructor: (@inspector = new Inspector()) ->
+    @bindings = {}
 
   bind: (name) ->
     assert name?, 'The argument "name" must have a value'
@@ -23,40 +23,46 @@ class Forge
     return count
 
   rebind: (name) ->
-    assert name?, 'The argumetn "name" must have a value'
+    assert name?, 'The argument "name" must have a value'
     @unbind(name)
     return @bind(name)
 
   get: (name, hint, args) ->
-    assert name?, 'The argument "name" must have a value'
-    bindings = @getMatchingBindings(name, hint)
-    if bindings.length == 0
-      throw new ResolutionError(name, 'No matching bindings were available')
-    return @resolve(bindings, args, true)
+    @resolve(new Context(), name, hint, args)
 
   getOne: (name, hint, args) ->
     assert name?, 'The argument "name" must have a value'
+    context  = new Context()
     bindings = @getMatchingBindings(name, hint)
     if bindings.length == 0
-      throw new ResolutionError(name, 'No matching bindings were available')
+      throw new ResolutionError(name, context, 'No matching bindings were available')
     unless bindings.length == 1
-      throw new ResolutionError(name, 'Multiple matching bindings were available')
-    return @resolve(bindings, args, true)
+      throw new ResolutionError(name, context, 'Multiple matching bindings were available')
+    return @resolveBindings(context, bindings, args, true)
 
   getAll: (name, args) ->
     assert name?, 'The argument "name" must have a value'
+    context  = new Context()
     bindings = @bindings[name]
     unless bindings?.length > 0
-      throw new ResolutionError(name, 'No matching bindings were available')
-    return @resolve(bindings, args, false)
+      throw new ResolutionError(name, context, 'No matching bindings were available')
+    return @resolveBindings(context, bindings, args, false)
 
   getMatchingBindings: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
 
-  resolve: (bindings, args, unwrap) ->
-    results = _.map bindings, (binding) -> binding.resolve(args)
+  resolve: (context, name, hint, args) ->
+    assert context?, 'The argument "context" must have a value'
+    assert name?,    'The argument "name" must have a value'
+    bindings = @getMatchingBindings(name, hint)
+    if bindings.length == 0
+      throw new ResolutionError(name, context, 'No matching bindings were available')
+    return @resolveBindings(context, bindings, args, true)
+
+  resolveBindings: (context, bindings, args, unwrap) ->
+    results = _.map bindings, (binding) -> binding.resolve(context, args)
     if unwrap and results.length == 1
       return results[0]
     else

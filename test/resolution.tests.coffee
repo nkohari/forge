@@ -18,7 +18,7 @@ describe 'Resolution', ->
       forge.bind('b').to.type(CircularB)
 
       expectedMessage = (name) ->
-        "Could not resolve binding for component named #{name}: Circular dependencies detected"
+        "Could not resolve component named #{name}: Circular dependencies detected"
 
       it 'should throw a ResolutionError when "a" is requested', ->
         resolve = -> forge.get('a')

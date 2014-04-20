@@ -9,8 +9,8 @@ class FunctionResolver extends Resolver
     assert @func?, 'The argument "func" must have a value'
     @dependencies = @forge.inspector.getDependencies(@func)
 
-  resolve: (args) ->
-    args = @resolveDependencies(@dependencies, args)
+  resolve: (context, args) ->
+    args = @resolveDependencies(context, @dependencies, args)
     @func.apply(null, args)
 
   toString: ->

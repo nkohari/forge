@@ -46,7 +46,6 @@
       assert(this.name != null, 'The argument "name" must have a value');
       this.lifecycle = new SingletonLifecycle();
       this["arguments"] = {};
-      this.isResolving = false;
     }
 
     Binding.prototype.matches = function(hint) {
@@ -57,23 +56,24 @@
       }
     };
 
-    Binding.prototype.resolve = function(args) {
+    Binding.prototype.resolve = function(context, args) {
       var result;
       if (args == null) {
         args = {};
       }
+      assert(context, 'The argument "context" must have a value');
       if (this.lifecycle == null) {
         throw new ConfigurationError(this.name, 'No lifecycle defined');
       }
       if (this.resolver == null) {
         throw new ConfigurationError(this.name, 'No resolver defined');
       }
-      if (this.isResolving) {
-        throw new ResolutionError(this.name, 'Circular dependencies detected');
+      if (context.has(this)) {
+        throw new ResolutionError(this.name, context, 'Circular dependencies detected');
       }
-      this.isResolving = true;
-      result = this.lifecycle.resolve(this.resolver, args);
-      this.isResolving = false;
+      context.push(this);
+      result = this.lifecycle.resolve(this.resolver, context, args);
+      context.pop();
       return result;
     };
 
@@ -120,18 +120,19 @@
     });
 
     Binding.prototype.toString = function() {
-      var tokens;
-      tokens = [this.name];
+      var tokens, _ref;
+      tokens = [];
       if (this.predicate != null) {
-        tokens.push('?');
+        tokens.push('(conditional)');
       }
+      tokens.push(this.name);
       tokens.push('->');
-      if (this.resolver != null) {
-        tokens.push(this.resolver.toString());
-      } else {
-        tokens.push('?');
+      tokens.push(this.resolver != null ? this.resolver.toString() : '<undefined resolver>');
+      tokens.push("(" + (this.lifecycle.toString()) + ")");
+      if (((_ref = this.resolver.dependencies) != null ? _ref.length : void 0) > 0) {
+        tokens.push("depends on: [" + (this.resolver.dependencies.join(', ')) + "]");
       }
-      return tokens.join('');
+      return tokens.join(' ');
     };
 
     return Binding;

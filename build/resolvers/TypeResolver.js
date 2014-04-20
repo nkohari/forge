@@ -22,9 +22,9 @@
       this.dependencies = this.forge.inspector.getDependencies(constructor);
     }
 
-    TypeResolver.prototype.resolve = function(args) {
+    TypeResolver.prototype.resolve = function(context, args) {
       var ctor;
-      args = this.resolveDependencies(this.dependencies, args);
+      args = this.resolveDependencies(context, this.dependencies, args);
       ctor = this.type.bind.apply(this.type, [null].concat(args));
       return new ctor();
     };

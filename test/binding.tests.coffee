@@ -243,7 +243,6 @@ describe 'Binding', ->
       it 'should return an instance of Bar if get() is called for "b" after unbinding "a"', ->
         forge.unbind('a')
         b = forge.get('b')
-        console.log require('util').inspect(forge, 999)
         expect(b).to.be.an.instanceOf(Bar)
 
 #---------------------------------------------------------------------------------------------------
