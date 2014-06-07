@@ -5,7 +5,8 @@
   _ = require('underscore');
 
   Context = (function() {
-    function Context() {
+    function Context(hint) {
+      this.hint = hint;
       this.bindings = [];
     }
 

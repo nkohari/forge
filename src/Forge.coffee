@@ -28,11 +28,11 @@ class Forge
     return @bind(name)
 
   get: (name, hint, args) ->
-    @resolve(new Context(), name, hint, args)
+    @resolve(new Context(hint), name, args)
 
   getOne: (name, hint, args) ->
     assert name?, 'The argument "name" must have a value'
-    context  = new Context()
+    context  = new Context(hint)
     bindings = @getMatchingBindings(name, hint)
     if bindings.length == 0
       throw new ResolutionError(name, context, 'No matching bindings were available')
@@ -53,10 +53,10 @@ class Forge
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
 
-  resolve: (context, name, hint, args) ->
+  resolve: (context, name, args) ->
     assert context?, 'The argument "context" must have a value'
     assert name?,    'The argument "name" must have a value'
-    bindings = @getMatchingBindings(name, hint)
+    bindings = @getMatchingBindings(name, context.hint)
     if bindings.length == 0
       throw new ResolutionError(name, context, 'No matching bindings were available')
     return @resolveBindings(context, bindings, args, true)

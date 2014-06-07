@@ -43,13 +43,13 @@
     };
 
     Forge.prototype.get = function(name, hint, args) {
-      return this.resolve(new Context(), name, hint, args);
+      return this.resolve(new Context(hint), name, args);
     };
 
     Forge.prototype.getOne = function(name, hint, args) {
       var bindings, context;
       assert(name != null, 'The argument "name" must have a value');
-      context = new Context();
+      context = new Context(hint);
       bindings = this.getMatchingBindings(name, hint);
       if (bindings.length === 0) {
         throw new ResolutionError(name, context, 'No matching bindings were available');
@@ -81,11 +81,11 @@
       });
     };
 
-    Forge.prototype.resolve = function(context, name, hint, args) {
+    Forge.prototype.resolve = function(context, name, args) {
       var bindings;
       assert(context != null, 'The argument "context" must have a value');
       assert(name != null, 'The argument "name" must have a value');
-      bindings = this.getMatchingBindings(name, hint);
+      bindings = this.getMatchingBindings(name, context.hint);
       if (bindings.length === 0) {
         throw new ResolutionError(name, context, 'No matching bindings were available');
       }
