@@ -231,8 +231,7 @@ Finally, if you have conditional bindings registered, and you'd only like to res
 you can specify an additional hint you'd like to use to resolve the dependency in the hint itself.
 (Yo dawg, I heard you like hints...)
 
-
-```
+```coffeescript
 Forge = require 'forge-di'
 
 class RedPlugin
