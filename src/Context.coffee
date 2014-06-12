@@ -2,7 +2,7 @@ _ = require 'underscore'
 
 class Context
 
-  constructor: (@hint) ->
+  constructor: ->
     @bindings = []
 
   has: (binding) ->

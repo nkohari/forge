@@ -7,7 +7,8 @@ class Inspector
     assert func?, 'The argument "func" must have a value'
     params = @getParameterNames(func)
     hints  = @getDependencyHints(func)
-    return _.map params, (param) -> hints[param] ? param
+    return _.map params, (param) ->
+      hints[param] ? {name: param, all: false, hint: undefined}
 
   getParameterNames: (func) ->
     assert func?, 'The argument "func" must have a value'
@@ -18,11 +19,17 @@ class Inspector
 
   getDependencyHints: (func) ->
     assert func?, 'The argument "func" must have a value'
-    regex = /"(.*?)\s*->\s*(.*?)";/g
+    regex = /"(.*?)\s*->\s*(all)?\s*(.*?)";/gi
     hints = {}
     while match = regex.exec(func.toString())
-      [hint, argument, dependency] = match
-      hints[argument] = dependency
+      [pattern, argument, all, dependency] = match
+      all = true if all?
+      if dependency.indexOf(':')
+        [name, hint] = dependency.split(/\s*:\s*/, 2)
+      else
+        name = dependency
+        hint = undefined
+      hints[argument] = {name, all, hint}
     return hints
 
   isAutoConstructor: (constructor) ->

@@ -10,9 +10,9 @@ and probably isn't production-ready just yet.
 - [Foreward, and forewarning](#foreward-and-forewarning)
 - [Getting started](#getting-started)
 - [So how's it work?](#so-hows-it-work)
-- [Dependency hints](#dependency-hints)
 - [Multiple bindings for a single component](#multiple-bindings-for-a-single-component)
 - [Conditional bindings and resolution hints](#conditional-bindings-and-resolution-hints)
+- [Dependency hints](#dependency-hints)
 - [Lifecycles](#lifecycles)
 - [Explicit arguments](#explicit-arguments)
 - [Unbinding and Rebinding](#unbinding-and-rebinding)
@@ -100,23 +100,6 @@ assert(foo instanceof Foo)
 assert(foo.bar instanceof Bar)
 ```
 
-## Dependency hints
-
-If you don't want to rely on the convention of naming your constructor arguments the same as your
-components, you can add *dependency hints* to your types instead. The syntax is reminiscent
-of `use strict`:
-
-```coffeescript
-class TypeWithHints
-  constructor: (@dependency1, @dependency2) ->
-    "dependency1->foo"
-    "dependency2->bar"
-```
-
-When Forge creates an instance of `TypeWithHints`, instead of trying to resolve components named
-`dependency1` and `dependency2`, instead it will read the hints, and resolve components named `foo`
-and `bar` instead.
-
 ## Multiple bindings for a single component
 
 You can also register multiple bindings for a single component name. For example, you might want
@@ -195,6 +178,83 @@ associated with your conditional bindings understand how to evaluate them.
 
 If multiple bindings match, `Forge.get()` will return an array of results.
 (See [Multiple Bindings for a Single Component](#multiple-bindings-for-a-single-component) above.)
+
+## Dependency hints
+
+If you don't want to rely on the convention of naming your constructor arguments the same as your
+components, you can add *dependency hints* to your types instead. The syntax is reminiscent
+of `use strict`:
+
+```coffeescript
+class TypeWithHints
+  constructor: (@dependency1, @dependency2) ->
+    "dependency1 -> foo"
+    "dependency2 -> bar"
+```
+
+When Forge creates an instance of `TypeWithHints`, instead of trying to resolve components named
+`dependency1` and `dependency2`, instead it will read the hints, and resolve components named `foo`
+and `bar` instead.
+
+If you have [conditional bindings](#conditional-bindings-and-resolution-hints) registered, you can
+use dependency hints to specify that you'd like to resolve *all* of the available components,
+regardless of whether conditions have been set.
+
+```coffeescript
+Forge = require 'forge-di'
+
+class RedPlugin
+  constructor: ->
+
+class BluePlugin
+  constructor: ->
+
+class Facade
+  constructor: (@plugins) ->
+    "plugins -> all plugin"
+
+# Register multiple conditional bindings for the "plugin" component
+forge = new Forge()
+forge.bind('plugin').to.type(RedPlugin).when('red')
+forge.bind('plugin').to.type(BluePlugin).when('blue')
+forge.bind('facade').to.type(Facade)
+
+# Forge disregards the conditions and passes an array of instances to the Facade constructor
+facade = forge.get('facade')
+assert(typeof facade.plugins == 'array')
+assert(facade.plugins.length == 2)
+assert(facade.plugins[0] instanceof RedPlugin)
+assert(facade.plugins[1] instanceof BluePlugin)
+```
+
+Finally, if you have conditional bindings registered, and you'd only like to resolve a single one,
+you can specify an additional hint you'd like to use to resolve the dependency in the hint itself.
+(Yo dawg, I heard you like hints...)
+
+
+```
+Forge = require 'forge-di'
+
+class RedPlugin
+  constructor: ->
+
+class BluePlugin
+  constructor: ->
+
+class Facade
+  constructor: (@plugin) ->
+    "plugin -> plugin: blue"
+
+# Register multiple conditional bindings for the "plugin" component
+forge = new Forge()
+forge.bind('plugin').to.type(RedPlugin).when('red')
+forge.bind('plugin').to.type(BluePlugin).when('blue')
+forge.bind('facade').to.type(Facade)
+
+# Forge uses the additional hint to determine which conditional binding to resolve
+facade = forge.get('facade')
+assert(facade.plugin instanceof BluePlugin)
+```
 
 ## Lifecycles
 

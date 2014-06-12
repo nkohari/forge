@@ -16,7 +16,11 @@
       hints = this.getDependencyHints(func);
       return _.map(params, function(param) {
         var _ref;
-        return (_ref = hints[param]) != null ? _ref : param;
+        return (_ref = hints[param]) != null ? _ref : {
+          name: param,
+          all: false,
+          hint: void 0
+        };
       });
     };
 
@@ -32,13 +36,26 @@
     };
 
     Inspector.prototype.getDependencyHints = function(func) {
-      var argument, dependency, hint, hints, match, regex;
+      var all, argument, dependency, hint, hints, match, name, pattern, regex, _ref;
       assert(func != null, 'The argument "func" must have a value');
-      regex = /"(.*?)\s*->\s*(.*?)";/g;
+      regex = /"(.*?)\s*->\s*(all)?\s*(.*?)";/gi;
       hints = {};
       while (match = regex.exec(func.toString())) {
-        hint = match[0], argument = match[1], dependency = match[2];
-        hints[argument] = dependency;
+        pattern = match[0], argument = match[1], all = match[2], dependency = match[3];
+        if (all != null) {
+          all = true;
+        }
+        if (dependency.indexOf(':')) {
+          _ref = dependency.split(/\s*:\s*/, 2), name = _ref[0], hint = _ref[1];
+        } else {
+          name = dependency;
+          hint = void 0;
+        }
+        hints[argument] = {
+          name: name,
+          all: all,
+          hint: hint
+        };
       }
       return hints;
     };

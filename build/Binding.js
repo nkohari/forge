@@ -56,7 +56,7 @@
       }
     };
 
-    Binding.prototype.resolve = function(context, args) {
+    Binding.prototype.resolve = function(context, hint, args) {
       var result;
       if (args == null) {
         args = {};
@@ -69,7 +69,7 @@
         throw new ConfigurationError(this.name, 'No resolver defined');
       }
       if (context.has(this)) {
-        throw new ResolutionError(this.name, context, 'Circular dependencies detected');
+        throw new ResolutionError(this.name, hint, context, 'Circular dependencies detected');
       }
       context.push(this);
       result = this.lifecycle.resolve(this.resolver, context, args);
@@ -120,7 +120,7 @@
     });
 
     Binding.prototype.toString = function() {
-      var tokens, _ref;
+      var deps, tokens, _ref;
       tokens = [];
       if (this.predicate != null) {
         tokens.push('(conditional)');
@@ -130,7 +130,14 @@
       tokens.push(this.resolver != null ? this.resolver.toString() : '<undefined resolver>');
       tokens.push("(" + (this.lifecycle.toString()) + ")");
       if (((_ref = this.resolver.dependencies) != null ? _ref.length : void 0) > 0) {
-        tokens.push("depends on: [" + (this.resolver.dependencies.join(', ')) + "]");
+        deps = _.map(this.resolver.dependencies, function(dep) {
+          if (dep.hint != null) {
+            return "" + dep.name + ":" + dep.hint;
+          } else {
+            return dep.name;
+          }
+        });
+        tokens.push("depends on: [" + (deps.join(', ')) + "]");
       }
       return tokens.join(' ');
     };

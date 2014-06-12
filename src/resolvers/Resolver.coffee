@@ -10,9 +10,10 @@ class Resolver
   resolve: (context, args) ->
     throw new Error("You must implement resolve() on #{@constructor.name}")
 
-  resolveDependencies: (context, names, args) ->
-    _.map names, (name) =>
-      return @forge if name is 'forge'
-      return args[name] ? @binding.arguments[name] ? @forge.resolve(context, name)
+  resolveDependencies: (context, dependencies, args) ->
+    _.map dependencies, (dep) =>
+      return @forge if dep.name is 'forge'
+      override = args[dep.name] ? @binding.arguments[dep.name]
+      return override ? @forge.resolve(context, dep.name, dep.hint, dep.all)
 
 module.exports = Resolver

@@ -28,14 +28,14 @@ class Binding
   matches: (hint) ->
     if @predicate? then @predicate(hint) else true
 
-  resolve: (context, args = {}) ->
+  resolve: (context, hint, args = {}) ->
     assert context, 'The argument "context" must have a value'
     unless @lifecycle?
       throw new ConfigurationError(@name, 'No lifecycle defined')
     unless @resolver?
       throw new ConfigurationError(@name, 'No resolver defined')
     if context.has(this)
-      throw new ResolutionError(@name, context, 'Circular dependencies detected')
+      throw new ResolutionError(@name, hint, context, 'Circular dependencies detected')
     context.push(this)
     result = @lifecycle.resolve(@resolver, context, args)
     context.pop()
@@ -80,7 +80,9 @@ class Binding
     tokens.push if @resolver? then @resolver.toString() else '<undefined resolver>'
     tokens.push "(#{@lifecycle.toString()})"
     if @resolver.dependencies?.length > 0
-      tokens.push "depends on: [#{@resolver.dependencies.join(', ')}]"
+      deps = _.map @resolver.dependencies, (dep) ->
+        if dep.hint? then "#{dep.name}:#{dep.hint}" else dep.name
+      tokens.push "depends on: [#{deps.join(', ')}]"
     tokens.join(' ')
 
 module.exports = Binding

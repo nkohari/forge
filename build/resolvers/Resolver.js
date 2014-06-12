@@ -18,14 +18,15 @@
       throw new Error("You must implement resolve() on " + this.constructor.name);
     };
 
-    Resolver.prototype.resolveDependencies = function(context, names, args) {
-      return _.map(names, (function(_this) {
-        return function(name) {
-          var _ref, _ref1;
-          if (name === 'forge') {
+    Resolver.prototype.resolveDependencies = function(context, dependencies, args) {
+      return _.map(dependencies, (function(_this) {
+        return function(dep) {
+          var override, _ref;
+          if (dep.name === 'forge') {
             return _this.forge;
           }
-          return (_ref = (_ref1 = args[name]) != null ? _ref1 : _this.binding["arguments"][name]) != null ? _ref : _this.forge.resolve(context, name);
+          override = (_ref = args[dep.name]) != null ? _ref : _this.binding["arguments"][dep.name];
+          return override != null ? override : _this.forge.resolve(context, dep.name, dep.hint, dep.all);
         };
       })(this));
     };

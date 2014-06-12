@@ -2,7 +2,7 @@ expect          = require('chai').expect
 Forge           = require '../src/Forge'
 ResolutionError = require '../src/errors/ResolutionError'
 
-{Foo, Bar, DependsOnFoo, TypeWithBindingHints, DependsOnForge} = require './lib/types'
+{Foo, Bar, DependsOnFoo, TypeWithBindingHints, TypeWithAllBindingHint, TypeWithConditionalBindingHint, DependsOnForge} = require './lib/types'
 
 describe 'Binding', ->
 
@@ -100,6 +100,32 @@ describe 'Binding', ->
         expect(result).to.be.an.instanceOf(TypeWithBindingHints)
         expect(result.dep1).to.be.an.instanceOf(Foo)
         expect(result.dep2).to.be.an.instanceOf(Bar)
+
+    describe 'given a binding to a type that contains an "all" binding hint', ->
+
+      forge = new Forge()
+      forge.bind('dep').to.type(Foo).when('foo')
+      forge.bind('dep').to.type(Bar).when('bar')
+      forge.bind('hints').to.type(TypeWithAllBindingHint)
+
+      it 'should inject an array containing instances of Foo and Bar into an instance of TypeWithAllBindingHint', ->
+        result = forge.get('hints')
+        expect(result).to.be.an.instanceOf(TypeWithAllBindingHint)
+        expect(result.deps).to.be.an.instanceOf(Array)
+        expect(result.deps[0]).to.be.an.instanceOf(Foo)
+        expect(result.deps[1]).to.be.an.instanceOf(Bar)
+
+    describe 'given a binding to a type that contains a conditional binding hint', ->
+
+      forge = new Forge()
+      forge.bind('dep').to.type(Foo).when('foo')
+      forge.bind('dep').to.type(Bar).when('bar')
+      forge.bind('hints').to.type(TypeWithConditionalBindingHint)
+
+      it 'should inject an instance of Foo into an instance of TypeWithConditionalBindingHint', ->
+        result = forge.get('hints')
+        expect(result).to.be.an.instanceOf(TypeWithConditionalBindingHint)
+        expect(result.dep).to.be.an.instanceOf(Foo)
 
 #---------------------------------------------------------------------------------------------------
 

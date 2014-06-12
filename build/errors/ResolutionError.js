@@ -5,19 +5,19 @@
   util = require('util');
 
   ResolutionError = (function() {
-    function ResolutionError(name, context, message) {
+    function ResolutionError(name, hint, context, message) {
       this.name = 'ResolutionError';
-      this.message = this.getMessage(name, context, message);
+      this.message = this.getMessage(name, hint, context, message);
       Error.captureStackTrace(this, arguments.callee);
     }
 
-    ResolutionError.prototype.getMessage = function(name, context, message) {
+    ResolutionError.prototype.getMessage = function(name, hint, context, message) {
       var lines;
       lines = [];
       lines.push("Could not resolve component named " + name + ": " + message);
-      if (context.hint != null) {
+      if (hint != null) {
         lines.push('  With resolution hint:');
-        lines.push("    " + (util.inspect(context.hint)));
+        lines.push("    " + (util.inspect(hint)));
       }
       lines.push('  In resolution context:');
       lines.push(context.toString());

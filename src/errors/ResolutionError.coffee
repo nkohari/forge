@@ -2,17 +2,17 @@ util = require 'util'
 
 class ResolutionError
 
-  constructor: (name, context, message) ->
+  constructor: (name, hint, context, message) ->
     @name    = 'ResolutionError'
-    @message = @getMessage(name, context, message)
+    @message = @getMessage(name, hint, context, message)
     Error.captureStackTrace(this, arguments.callee)
 
-  getMessage: (name, context, message) ->
+  getMessage: (name, hint, context, message) ->
     lines = []
     lines.push "Could not resolve component named #{name}: #{message}"
-    if context.hint?
+    if hint?
       lines.push '  With resolution hint:'
-      lines.push "    #{util.inspect(context.hint)}"
+      lines.push "    #{util.inspect(hint)}"
     lines.push '  In resolution context:'
     lines.push context.toString()
     lines.push '  ---'

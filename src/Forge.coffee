@@ -28,41 +28,44 @@ class Forge
     return @bind(name)
 
   get: (name, hint, args) ->
-    @resolve(new Context(hint), name, args)
+    @resolve(new Context(), name, hint, false, args)
 
   getOne: (name, hint, args) ->
     assert name?, 'The argument "name" must have a value'
-    context  = new Context(hint)
+    context  = new Context()
     bindings = @getMatchingBindings(name, hint)
     if bindings.length == 0
-      throw new ResolutionError(name, context, 'No matching bindings were available')
+      throw new ResolutionError(name, hint, context, 'No matching bindings were available')
     unless bindings.length == 1
-      throw new ResolutionError(name, context, 'Multiple matching bindings were available')
-    return @resolveBindings(context, bindings, args, true)
+      throw new ResolutionError(name, hint, context, 'Multiple matching bindings were available')
+    return @resolveBindings(context, bindings, hint, args, true)
 
   getAll: (name, args) ->
     assert name?, 'The argument "name" must have a value'
     context  = new Context()
     bindings = @bindings[name]
     unless bindings?.length > 0
-      throw new ResolutionError(name, context, 'No matching bindings were available')
-    return @resolveBindings(context, bindings, args, false)
+      throw new ResolutionError(name, undefined, context, 'No matching bindings were available')
+    return @resolveBindings(context, bindings, undefined, args, false)
 
   getMatchingBindings: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
 
-  resolve: (context, name, args) ->
+  resolve: (context, name, hint, all, args) ->
     assert context?, 'The argument "context" must have a value'
     assert name?,    'The argument "name" must have a value'
-    bindings = @getMatchingBindings(name, context.hint)
+    if all
+      bindings = @bindings[name]
+    else
+      bindings = @getMatchingBindings(name, hint)
     if bindings.length == 0
-      throw new ResolutionError(name, context, 'No matching bindings were available')
-    return @resolveBindings(context, bindings, args, true)
+      throw new ResolutionError(name, hint, context, 'No matching bindings were available')
+    return @resolveBindings(context, bindings, hint, args, true)
 
-  resolveBindings: (context, bindings, args, unwrap) ->
-    results = _.map bindings, (binding) -> binding.resolve(context, args)
+  resolveBindings: (context, bindings, hint, args, unwrap) ->
+    results = _.map bindings, (binding) -> binding.resolve(context, hint, args)
     if unwrap and results.length == 1
       return results[0]
     else

@@ -43,21 +43,21 @@
     };
 
     Forge.prototype.get = function(name, hint, args) {
-      return this.resolve(new Context(hint), name, args);
+      return this.resolve(new Context(), name, hint, false, args);
     };
 
     Forge.prototype.getOne = function(name, hint, args) {
       var bindings, context;
       assert(name != null, 'The argument "name" must have a value');
-      context = new Context(hint);
+      context = new Context();
       bindings = this.getMatchingBindings(name, hint);
       if (bindings.length === 0) {
-        throw new ResolutionError(name, context, 'No matching bindings were available');
+        throw new ResolutionError(name, hint, context, 'No matching bindings were available');
       }
       if (bindings.length !== 1) {
-        throw new ResolutionError(name, context, 'Multiple matching bindings were available');
+        throw new ResolutionError(name, hint, context, 'Multiple matching bindings were available');
       }
-      return this.resolveBindings(context, bindings, args, true);
+      return this.resolveBindings(context, bindings, hint, args, true);
     };
 
     Forge.prototype.getAll = function(name, args) {
@@ -66,9 +66,9 @@
       context = new Context();
       bindings = this.bindings[name];
       if (!((bindings != null ? bindings.length : void 0) > 0)) {
-        throw new ResolutionError(name, context, 'No matching bindings were available');
+        throw new ResolutionError(name, void 0, context, 'No matching bindings were available');
       }
-      return this.resolveBindings(context, bindings, args, false);
+      return this.resolveBindings(context, bindings, void 0, args, false);
     };
 
     Forge.prototype.getMatchingBindings = function(name, hint) {
@@ -81,21 +81,25 @@
       });
     };
 
-    Forge.prototype.resolve = function(context, name, args) {
+    Forge.prototype.resolve = function(context, name, hint, all, args) {
       var bindings;
       assert(context != null, 'The argument "context" must have a value');
       assert(name != null, 'The argument "name" must have a value');
-      bindings = this.getMatchingBindings(name, context.hint);
-      if (bindings.length === 0) {
-        throw new ResolutionError(name, context, 'No matching bindings were available');
+      if (all) {
+        bindings = this.bindings[name];
+      } else {
+        bindings = this.getMatchingBindings(name, hint);
       }
-      return this.resolveBindings(context, bindings, args, true);
+      if (bindings.length === 0) {
+        throw new ResolutionError(name, hint, context, 'No matching bindings were available');
+      }
+      return this.resolveBindings(context, bindings, hint, args, true);
     };
 
-    Forge.prototype.resolveBindings = function(context, bindings, args, unwrap) {
+    Forge.prototype.resolveBindings = function(context, bindings, hint, args, unwrap) {
       var results;
       results = _.map(bindings, function(binding) {
-        return binding.resolve(context, args);
+        return binding.resolve(context, hint, args);
       });
       if (unwrap && results.length === 1) {
         return results[0];
