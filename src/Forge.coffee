@@ -58,11 +58,13 @@ class Forge
     assert name?,    'The argument "name" must have a value'
     if all
       bindings = @bindings[name]
+      unwrap   = false
     else
       bindings = @getMatchingBindings(name, hint)
+      unwrap   = true
     if bindings.length == 0
       throw new ResolutionError(name, hint, context, 'No matching bindings were available')
-    return @resolveBindings(context, bindings, hint, args, true)
+    return @resolveBindings(context, bindings, hint, args, unwrap)
 
   resolveBindings: (context, bindings, hint, args, unwrap) ->
     results = _.map bindings, (binding) -> binding.resolve(context, hint, args)

@@ -82,18 +82,20 @@
     };
 
     Forge.prototype.resolve = function(context, name, hint, all, args) {
-      var bindings;
+      var bindings, unwrap;
       assert(context != null, 'The argument "context" must have a value');
       assert(name != null, 'The argument "name" must have a value');
       if (all) {
         bindings = this.bindings[name];
+        unwrap = false;
       } else {
         bindings = this.getMatchingBindings(name, hint);
+        unwrap = true;
       }
       if (bindings.length === 0) {
         throw new ResolutionError(name, hint, context, 'No matching bindings were available');
       }
-      return this.resolveBindings(context, bindings, hint, args, true);
+      return this.resolveBindings(context, bindings, hint, args, unwrap);
     };
 
     Forge.prototype.resolveBindings = function(context, bindings, hint, args, unwrap) {
