@@ -62,7 +62,7 @@ class Forge
     else
       bindings = @getMatchingBindings(name, hint)
       unwrap   = true
-    if bindings.length == 0
+    if bindings?.length == 0
       throw new ResolutionError(name, hint, context, 'No matching bindings were available')
     return @resolveBindings(context, bindings, hint, args, unwrap)
 

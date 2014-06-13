@@ -92,7 +92,7 @@
         bindings = this.getMatchingBindings(name, hint);
         unwrap = true;
       }
-      if (bindings.length === 0) {
+      if ((bindings != null ? bindings.length : void 0) === 0) {
         throw new ResolutionError(name, hint, context, 'No matching bindings were available');
       }
       return this.resolveBindings(context, bindings, hint, args, unwrap);
