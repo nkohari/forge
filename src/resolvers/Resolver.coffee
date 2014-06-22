@@ -14,6 +14,6 @@ class Resolver
     _.map dependencies, (dep) =>
       return @forge if dep.name is 'forge'
       override = args[dep.name] ? @binding.arguments[dep.name]
-      return override ? @forge.resolve(context, dep.name, dep.hint, dep.all)
+      return override ? @forge.resolve(dep.name, context, dep.hint, dep.all)
 
 module.exports = Resolver

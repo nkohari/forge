@@ -43,7 +43,7 @@
     };
 
     Forge.prototype.get = function(name, hint, args) {
-      return this.resolve(new Context(), name, hint, false, args);
+      return this.resolve(name, new Context(), hint, false, args);
     };
 
     Forge.prototype.getOne = function(name, hint, args) {
@@ -81,10 +81,12 @@
       });
     };
 
-    Forge.prototype.resolve = function(context, name, hint, all, args) {
+    Forge.prototype.resolve = function(name, context, hint, all, args) {
       var bindings, unwrap;
-      assert(context != null, 'The argument "context" must have a value');
       assert(name != null, 'The argument "name" must have a value');
+      if (context == null) {
+        context = new Context();
+      }
       if (all) {
         bindings = this.bindings[name];
         unwrap = false;

@@ -26,7 +26,7 @@
             return _this.forge;
           }
           override = (_ref = args[dep.name]) != null ? _ref : _this.binding["arguments"][dep.name];
-          return override != null ? override : _this.forge.resolve(context, dep.name, dep.hint, dep.all);
+          return override != null ? override : _this.forge.resolve(dep.name, context, dep.hint, dep.all);
         };
       })(this));
     };

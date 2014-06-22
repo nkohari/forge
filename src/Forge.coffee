@@ -28,7 +28,7 @@ class Forge
     return @bind(name)
 
   get: (name, hint, args) ->
-    @resolve(new Context(), name, hint, false, args)
+    @resolve(name, new Context(), hint, false, args)
 
   getOne: (name, hint, args) ->
     assert name?, 'The argument "name" must have a value'
@@ -53,9 +53,9 @@ class Forge
     return [] unless @bindings[name]?
     return _.filter @bindings[name], (b) -> b.matches(hint)
 
-  resolve: (context, name, hint, all, args) ->
-    assert context?, 'The argument "context" must have a value'
-    assert name?,    'The argument "name" must have a value'
+  resolve: (name, context, hint, all, args) ->
+    assert name?, 'The argument "name" must have a value'
+    context ?= new Context()
     if all
       bindings = @bindings[name]
       unwrap   = false
