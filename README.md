@@ -2,8 +2,9 @@
 
 ![](https://farm6.staticflickr.com/5541/9936685246_21e70691f0.jpg)
 
-Forge is a dependency injection framework for Node.js. It was built primarily as an experiment,
-and probably isn't production-ready just yet.
+Forge is a dependency injection framework for Node.js. It was originally built as an experiment,
+but is now in use in production at [Adzerk](http://adzerk.com/), where the software it powers
+handles billions of requests each month.
 
 **Table of Contents**
 
