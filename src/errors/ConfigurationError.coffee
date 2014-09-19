@@ -4,4 +4,6 @@ class ConfigurationError extends Error
     @message = "The binding for component named #{name} is misconfigured: #{message}"
     Error.captureStackTrace(this, arguments.callee)
 
+  toString: -> @message
+  
 module.exports = ConfigurationError

@@ -7,6 +7,8 @@ class ResolutionError
     @message = @getMessage(name, hint, context, message)
     Error.captureStackTrace(this, arguments.callee)
 
+  toString: -> @message
+
   getMessage: (name, hint, context, message) ->
     lines = []
     lines.push "Could not resolve component named #{name}: #{message}"

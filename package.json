@@ -1,6 +1,6 @@
 {
   "name": "forge-di",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "a dependency injector for node.js",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "underscore": "1.6.0"
   },
   "devDependencies": {
-    "coffee-script": "1.7.1",
+    "coffee-script": "1.8.0",
     "chai": "1.9.1",
     "mocha": "1.18.2"
   },
