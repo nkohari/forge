@@ -71,6 +71,14 @@
       return this.resolveBindings(context, bindings, void 0, args, false);
     };
 
+    Forge.prototype.create = function(type, args) {
+      var binding, context;
+      assert(type != null, 'The argument "type" must have a value');
+      context = new Context();
+      binding = new Binding(this, type.constructor.name).type(type);
+      return this.resolveBindings(context, [binding], void 0, args, true);
+    };
+
     Forge.prototype.getMatchingBindings = function(name, hint) {
       assert(name != null, 'The argument "name" must have a value');
       if (this.bindings[name] == null) {

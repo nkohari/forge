@@ -57,3 +57,25 @@ describe 'Resolution', ->
           expect(result.foo).to.equal(foos[index])
     
 #---------------------------------------------------------------------------------------------------
+
+  describe 'Ephemeral bindings', ->
+
+    describe 'given one binding: foo->type{Foo}, and an unregistered type DependsOnFoo', ->
+
+      forge = new Forge()
+      forge.bind('foo').to.type(Foo)
+
+      it 'should inject an instance of Foo when create() is called with DependsOnFoo', ->
+        result = forge.create(DependsOnFoo)
+        expect(result).to.be.an.instanceOf(DependsOnFoo)
+        expect(result.foo).to.be.an.instanceOf(Foo)
+
+    describe 'given no bindings, and an unregistered type DependsOnFoo', ->
+
+      forge = new Forge()
+
+      it 'should throw an exception when create() is called with DependsOnFoo', ->
+        resolve = -> forge.create(DependsOnFoo)
+        expect(resolve).to.throw(ResolutionError, "Could not resolve component named foo: No matching bindings were available")
+    
+#---------------------------------------------------------------------------------------------------

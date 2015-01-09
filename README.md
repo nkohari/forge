@@ -16,6 +16,7 @@ handles billions of requests each month.
 - [Dependency hints](#dependency-hints)
 - [Lifecycles](#lifecycles)
 - [Explicit arguments](#explicit-arguments)
+- [Ephemeral bindings](#ephemeral-bindings)
 - [Unbinding and Rebinding](#unbinding-and-rebinding)
 - [License](#license)
 
@@ -388,6 +389,40 @@ assert(obj.forge === forge)
 ```
 
 *Use this sparingly!* You should always favor constructor injection to service location.
+
+## Ephemeral Bindings
+
+Sometimes you don't want to register all of your types with the Forge, instead only
+resolving their dependencies. If you already know what type you want to resolve,
+you can pass it to `Forge.create()` to request that its dependencies be resolved,
+and an instance be created.
+
+For example:
+
+```coffeescript
+Forge = require 'forge-di'
+
+class Foo
+  constructor: ->
+
+class DependsOnFoo
+  constructor: (@foo) ->
+
+forge = new Forge()
+forge.bind('foo').to.type(Foo)
+
+obj = forge.create(DependsOnFoo)
+assert(obj instanceof DependsOnFoo)
+assert(obj.foo instanceof Foo)
+```
+
+This effectively creates a temporary transient binding to `DependsOnFoo` that will only be
+resolved during the call to `Forge.create()`, and then discarded. You should avoid using
+this feature unless you're sure it's what you want. Most of your types should be registered
+as normal bindings, particularly if:
+
+1. You're resolving a dependency on the Forge itself in order to call `Forge.create()`.
+2. The type you're resolving via `Forge.create()` is a dependency of another type.
 
 ## Unbinding and Rebinding
 

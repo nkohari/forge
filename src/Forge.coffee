@@ -48,6 +48,12 @@ class Forge
       throw new ResolutionError(name, undefined, context, 'No matching bindings were available')
     return @resolveBindings(context, bindings, undefined, args, false)
 
+  create: (type, args) ->
+    assert type?, 'The argument "type" must have a value'
+    context = new Context()
+    binding = new Binding(this, type.constructor.name).type(type)
+    return @resolveBindings(context, [binding], undefined, args, true)
+
   getMatchingBindings: (name, hint) ->
     assert name?, 'The argument "name" must have a value'
     return [] unless @bindings[name]?
