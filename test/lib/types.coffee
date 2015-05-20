@@ -20,6 +20,31 @@ class TypeWithConditionalBindingHint
   constructor: (@dep) ->
     "dep -> dep: foo"
 
+class TypeWithBindingHintsStatic
+  constructor: (@dep1, @dep2) ->
+  @__hints__:
+    dep1:
+      name: 'a'
+    dep2:
+      name: 'b'
+
+
+class TypeWithAllBindingHintStatic
+  constructor: (@deps) ->
+  @__hints__:
+    deps:
+      name: 'dep'
+      all: true
+
+
+class TypeWithConditionalBindingHintStatic
+  constructor: (@dep) ->
+  @__hints__:
+    dep:
+      name: 'dep'
+      hint: 'foo'
+
+
 class DependsOnForge
   constructor: (@forge) ->
 
@@ -49,6 +74,9 @@ module.exports = {
   TypeWithBindingHints
   TypeWithAllBindingHint
   TypeWithConditionalBindingHint
+  TypeWithBindingHintsStatic
+  TypeWithAllBindingHintStatic
+  TypeWithConditionalBindingHintStatic
   DependsOnForge
   CircularA
   CircularB
