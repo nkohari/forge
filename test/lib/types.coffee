@@ -8,9 +8,9 @@ class DependsOnFoo
   constructor: (@foo) ->
 
 class TypeWithBindingHints
-  constructor: (@dep1, @dep2) ->
-    "dep1->a"
-    "dep2->b"
+  constructor: (@depA, @depB) ->
+    "depA->a"
+    "depB->b"
 
 class TypeWithAllBindingHint
   constructor: (@deps) ->

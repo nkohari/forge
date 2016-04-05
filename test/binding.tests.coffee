@@ -90,7 +90,7 @@ describe 'Binding', ->
 
     describe 'given a binding to a type that contains binding hints', ->
 
-      forge = new Forge()
+      forge = new Forge(null, true)
       forge.bind('a').to.type(Foo)
       forge.bind('b').to.type(Bar)
       forge.bind('hints').to.type(TypeWithBindingHints)
@@ -98,8 +98,8 @@ describe 'Binding', ->
       it 'should inject an instance of Foo and Bar into an instance of TypeWithBindingHints', ->
         result = forge.get('hints')
         expect(result).to.be.an.instanceOf(TypeWithBindingHints)
-        expect(result.dep1).to.be.an.instanceOf(Foo)
-        expect(result.dep2).to.be.an.instanceOf(Bar)
+        expect(result.depA).to.be.an.instanceOf(Foo)
+        expect(result.depB).to.be.an.instanceOf(Bar)
 
     describe 'given a binding to a type that contains an "all" binding hint', ->
 
@@ -412,5 +412,23 @@ describe 'Binding', ->
         a = forge.get('a')
         expect(a).to.be.an.instanceOf(DependsOnForge)
         expect(a.forge).to.equal(forge)
+
+#---------------------------------------------------------------------------------------------------
+
+  describe 'Binding name validation', ->
+
+    describe 'given a Forge with the default configuration', ->
+
+      it 'should throw an error if a binding is registered ending in a digit', ->
+        forge = new Forge()
+        register = -> forge.bind('a1').to.type(Foo)
+        expect(register).to.throw(Error)
+
+    describe 'given a Forge with unmangleNames = false', ->
+
+      it 'should allow bindings ending in a digit', ->
+        forge = new Forge({unmangleNames: false})
+        register = -> forge.bind('a1').to.type(Foo)
+        expect(register).to.not.throw()
 
 #---------------------------------------------------------------------------------------------------

@@ -7,11 +7,14 @@ ResolutionError = require './errors/ResolutionError'
 
 class Forge
 
-  constructor: (@inspector = new Inspector()) ->
+  constructor: (config = {}) ->
     @bindings = {}
+    @unmangleNames = config.unmangleNames ? true
+    @inspector     = config.inspector ? new Inspector(@unmangleNames)
 
   bind: (name) ->
     assert name?, 'The argument "name" must have a value'
+    assert @validateName(name), "Invalid binding name \"#{name}\""
     binding = new Binding(this, name)
     (@bindings[name] ?= []).push(binding)
     return binding
@@ -82,5 +85,11 @@ class Forge
   inspect: ->
     bindings = _.flatten _.values(@bindings)
     return _.invoke(bindings, 'toString').join('\n')
-
+  
+  validateName: (name) ->
+    if @unmangleNames
+      return /[^\d]$/.test(name)
+    else
+      return true
+      
 module.exports = Forge

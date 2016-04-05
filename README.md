@@ -20,6 +20,30 @@ handles billions of requests each month.
 - [Unbinding and Rebinding](#unbinding-and-rebinding)
 - [License](#license)
 
+## New in 0.10.0
+
+CoffeeScript 1.9.x made a change to the way variables are named, which confuses the secret voodoo
+that Forge uses to determine the names of constructor arguments. If more than one variable shares
+the same name in a scope, CoffeeScript will rename them to `foo`, `foo1`, `foo2`, etc.
+
+To solve this problem, Forge (as of 0.10.0) will now truncate any trailing digits from the names
+of arguments. This is a breaking change from previous versions, but shouldn't be a problem unless
+you've intentionally declared bindings with names ending in digits. (Forge will now also throw
+an error if you attempt to declare such a binding.)
+
+If you'd like to switch to the previous behavior, you can pass a flag to the `Forge` constructor:
+
+```coffeescript
+forge = new Forge({unmangleNames: false})
+```
+
+Note, also, that the Forge constructor signature has changed, so if you were passing in your
+own custom `Inspector` for some reason, it is now part of the config hash:
+
+```coffeescript
+forge = new Forge({inspector: new MyCustomInspector()})
+```
+
 ## Foreward, and forewarning
 
 First things first: I'm fairly certain that the existence of this framework will be controversial.

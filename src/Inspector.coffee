@@ -3,6 +3,8 @@ _      = require 'underscore'
 
 class Inspector
 
+  constructor: (@unmangleNames = false) ->
+
   getDependencies: (func) ->
     assert func?, 'The argument "func" must have a value'
     params = @getParameterNames(func)
@@ -15,7 +17,11 @@ class Inspector
     regex   = /function .*\(([^)]+)/g
     matches = regex.exec func.toString()
     return [] if !matches? or matches[1].length == 0
-    return matches[1].split /[,\s]+/
+    args = matches[1].split /[,\s]+/
+    if @unmangleNames
+      return _.map args, (arg) -> arg.replace(/\d+$/, '')
+    else
+      return args
 
   getDependencyHints: (func) ->
     assert func?, 'The argument "func" must have a value'
