@@ -20,6 +20,10 @@ handles billions of requests each month.
 - [Unbinding and Rebinding](#unbinding-and-rebinding)
 - [License](#license)
 
+## New in 0.10.1
+
+Forge now properly supports ES6/TypeScript classes.
+
 ## New in 0.10.0
 
 CoffeeScript 1.9.x made a change to the way variables are named, which confuses the secret voodoo
