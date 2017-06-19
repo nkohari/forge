@@ -507,7 +507,7 @@ avoid using it at runtime.
 
 ## License
 
-Copyright &copy; 2014 Nate Kohari.
+Copyright &copy; 2014-2017 Nate Kohari.
 Released under the Apache 2.0 license. See the file LICENSE for details.
 
 Image of forge &mdash; [Foyer de la forge Mustad](https://flic.kr/p/g957kq) by Frédéric BISSON (CC-BY)
