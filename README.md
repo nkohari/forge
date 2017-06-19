@@ -285,6 +285,57 @@ facade = forge.get('facade')
 assert(facade.plugin instanceof BluePlugin)
 ```
 
+**NOTE**: This can also be done via a static property on your class named `__hints__`. This property
+is an object that contains the dependency mapping name, all boolean flag (optional), and hint (optional).
+
+The following example shows the equivalent static property `__hints__` implementation as the constructor
+string literal example.
+
+```coffeescript
+
+class TypeWithBindingHints
+  constructor: (@dep1, @dep2) ->
+    "dep1->a"
+    "dep2->b"
+
+# is equivalent to
+class TypeWithBindingHintsStatic
+  constructor: (@dep1, @dep2) ->
+  @__hints__:
+    dep1:
+      name: 'a'
+    dep2:
+      name: 'b'
+
+#---------------------------------------------
+
+class TypeWithAllBindingHint
+  constructor: (@deps) ->
+    "deps -> all dep"
+
+# is equivalent to
+class TypeWithAllBindingHintStatic
+  constructor: (@deps) ->
+  @__hints__:
+    deps:
+      name: 'dep'
+      all: true
+
+#---------------------------------------------
+
+class TypeWithConditionalBindingHint
+  constructor: (@dep) ->
+    "dep -> dep: foo"
+
+# is equivalent to
+class TypeWithConditionalBindingHintStatic
+  constructor: (@dep) ->
+  @__hints__:
+    dep:
+      name: 'dep'
+      hint: 'foo'
+```
+
 ## Lifecycles
 
 By default, once a binding has been resolved, the result will be cached and re-used for

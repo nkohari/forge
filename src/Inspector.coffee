@@ -25,6 +25,10 @@ class Inspector
 
   getDependencyHints: (func) ->
     assert func?, 'The argument "func" must have a value'
+
+    if _.isObject(func.__hints__)
+      return func.__hints__
+
     regex = /"(.*?)\s*->\s*(all)?\s*(.*?)";/gi
     hints = {}
     while match = regex.exec(func.toString())
