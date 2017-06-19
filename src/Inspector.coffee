@@ -14,7 +14,7 @@ class Inspector
 
   getParameterNames: (func) ->
     assert func?, 'The argument "func" must have a value'
-    regex   = /function .*\(([^)]+)/g
+    regex   = /(?:function|constructor)[ A-Za-z0-9]*\(([^)]+)/g;
     matches = regex.exec func.toString()
     return [] if !matches? or matches[1].length == 0
     args = matches[1].split /[,\s]+/

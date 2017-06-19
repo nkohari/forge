@@ -29,7 +29,7 @@
     Inspector.prototype.getParameterNames = function(func) {
       var args, matches, regex;
       assert(func != null, 'The argument "func" must have a value');
-      regex = /function .*\(([^)]+)/g;
+      regex = /(?:function|constructor)[ A-Za-z0-9]*\(([^)]+)/g;
       matches = regex.exec(func.toString());
       if ((matches == null) || matches[1].length === 0) {
         return [];

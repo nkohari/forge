@@ -1,6 +1,6 @@
 {
   "name": "forge-di",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "a dependency injector for node.js",
   "repository": {
     "type": "git",
