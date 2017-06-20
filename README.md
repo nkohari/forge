@@ -1,3 +1,8 @@
+<aside class="warning">
+Warning! This version of Forge is outdated and no longer supported. Unless you're using CoffeScript, you probably
+want the <a href="https://github.com/nkohari/forge">current version</a>.
+</aside>
+
 # Forge
 
 ![](https://farm6.staticflickr.com/5541/9936685246_21e70691f0.jpg)
