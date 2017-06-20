@@ -1,12 +1,6 @@
 import ensure from './util/ensure';
 
-const InspectableFunctionRegExp = /(?:function|constructor)[ A-Za-z0-9]*\(([^)]*)/g;
-
 class Inspector {
-
-  constructor(unmangleNames = false) {
-    this.unmangleNames = unmangleNames;
-  }
 
   getDependencies(func) {
     ensure('func', func);
@@ -18,7 +12,8 @@ class Inspector {
   getParameterNames(func) {
     ensure('func', func);
 
-    const matches = new RegExp(InspectableFunctionRegExp, 'g').exec(func.toString());
+    const regex = /(?:function|constructor)[ A-Za-z0-9]*\(([^)]*)/g;
+    const matches = regex.exec(func.toString());
 
     if (matches == null || matches[1].length === 0) {
       return [];

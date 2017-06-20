@@ -2,22 +2,17 @@ import ensure from './util/ensure';
 import Binding from './Binding';
 import Context from './Context';
 import Inspector from './Inspector';
-import ConfigurationError from './errors/ConfigurationError';
 import ResolutionError from './errors/ResolutionError';
 
 class Forge {
 
   constructor(config = {}) {
     this.bindings = {};
-    this.unmangleNames = (config.unmangleNames != null) ? config.unmangleNames : true;
-    this.inspector = config.inspector || new Inspector(this.unmangleNames);
+    this.inspector = config.inspector || new Inspector();
   }
 
   bind(name) {
     ensure('name', name);
-    if (!this.validateName(name)) {
-      throw new ConfigurationError(name, 'Invalid name for binding');
-    }
     const binding = new Binding(this, name);
     const list = this.bindings[name] ? this.bindings[name] : (this.bindings[name] = []);
     list.push(binding);
@@ -113,13 +108,6 @@ class Forge {
     return lines.join('\n');
   }
 
-  validateName(name) {
-    if (this.unmangleNames) {
-      return /[^\d]$/.test(name);
-    } else {
-      return true;
-    }
-  }
 }
 
 export default Forge;

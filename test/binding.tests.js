@@ -513,26 +513,4 @@ describe('Binding', function() {
 
 //---------------------------------------------------------------------------------------------------
 
-  describe('Binding name validation', function() {
-
-    describe('given a Forge with the default configuration', () =>
-
-      it('should throw an error if a binding is registered ending in a digit', function() {
-        const forge = new Forge();
-        const register = () => forge.bind('a1').to.type(Foo);
-        expect(register).to.throw(Error);
-      })
-    );
-
-    describe('given a Forge with unmangleNames = false', () =>
-
-      it('should allow bindings ending in a digit', function() {
-        const forge = new Forge({ unmangleNames: false });
-        const register = () => forge.bind('a1').to.type(Foo);
-        expect(register).to.not.throw();
-      })
-    );
-  });
 });
-
-//---------------------------------------------------------------------------------------------------

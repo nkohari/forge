@@ -20,10 +20,6 @@ var _Inspector = require('./Inspector');
 
 var _Inspector2 = _interopRequireDefault(_Inspector);
 
-var _ConfigurationError = require('./errors/ConfigurationError');
-
-var _ConfigurationError2 = _interopRequireDefault(_ConfigurationError);
-
 var _ResolutionError = require('./errors/ResolutionError');
 
 var _ResolutionError2 = _interopRequireDefault(_ResolutionError);
@@ -34,15 +30,11 @@ class Forge {
 
   constructor(config = {}) {
     this.bindings = {};
-    this.unmangleNames = config.unmangleNames != null ? config.unmangleNames : true;
-    this.inspector = config.inspector || new _Inspector2.default(this.unmangleNames);
+    this.inspector = config.inspector || new _Inspector2.default();
   }
 
   bind(name) {
     (0, _ensure2.default)('name', name);
-    if (!this.validateName(name)) {
-      throw new _ConfigurationError2.default(name, 'Invalid name for binding');
-    }
     const binding = new _Binding2.default(this, name);
     const list = this.bindings[name] ? this.bindings[name] : this.bindings[name] = [];
     list.push(binding);
@@ -138,14 +130,6 @@ class Forge {
     return lines.join('\n');
   }
 
-  validateName(name) {
-    if (this.unmangleNames) {
-      return (/[^\d]$/.test(name)
-      );
-    } else {
-      return true;
-    }
-  }
 }
 
 exports.default = Forge;
