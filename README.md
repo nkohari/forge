@@ -9,7 +9,7 @@ handles billions of requests each month.
 **Table of Contents**
 
 - [Motivation](#motivation)
-- [New in 11.0.0](#new-in-11.0.0)
+- [New in 11.0.0](#new-in-1100)
 - [Getting started](#getting-started)
 - [So how's it work?](#so-hows-it-work)
 - [Multiple bindings for a single component](#multiple-bindings-for-a-single-component)
