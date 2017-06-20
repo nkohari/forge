@@ -40,7 +40,7 @@ that I'm "doing it wrong". :)
 ## New in 11.0.0
 
 Along with most of the JavaScript community, Forge has moved away from CoffeeScript in favor of ES6 via Babel.
-If you need support for CoffeeScript, please use the [https://github.com/nkohari/forge/tree/0.10.x](0.10.x branch).
+If you need support for CoffeeScript, please use the [0.10.x branch](https://github.com/nkohari/forge/tree/0.10.x).
 Forge has also switched to [semver](http://semver.org/) for version numbers.
 
 ### Breaking changes!
