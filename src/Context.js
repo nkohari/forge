@@ -1,8 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 class Context {
 
   constructor() {
@@ -23,11 +18,10 @@ class Context {
 
   toString(indent = 4) {
     const spaces = Array(indent + 1).join(' ');
-    const lines = this.bindings.map((binding, index) => `${spaces}${index + 1}: ${binding.toString()}`);
+    const lines = this.bindings.map((binding, index) => `${spaces}${index+1}: ${binding.toString()}`);
     return lines.reverse().join('\n');
   }
 
 }
 
-exports.default = Context;
-//# sourceMappingURL=Context.js.map
+export default Context;
