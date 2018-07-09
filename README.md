@@ -496,21 +496,25 @@ and an instance be created.
 
 For example:
 
-```coffeescript
-Forge = require 'forge-di'
+```js
+import Forge from 'forge-'di';
 
-class Foo
-  constructor: ->
+class Foo {
+  constructor() {}
+}
 
-class DependsOnFoo
-  constructor: (@foo) ->
+class DependsOnFoo {
+  constructor(foo) {
+    this.foo = foo;
+  }
+}
 
-forge = new Forge()
-forge.bind('foo').to.type(Foo)
+let forge = new Forge();
+forge.bind('foo').to.type(Foo);
 
-obj = forge.create(DependsOnFoo)
-assert(obj instanceof DependsOnFoo)
-assert(obj.foo instanceof Foo)
+let obj = forge.create(DependsOnFoo);
+assert(obj instanceof DependsOnFoo);
+assert(obj.foo instanceof Foo);
 ```
 
 This effectively creates a temporary transient binding to `DependsOnFoo` that will only be
