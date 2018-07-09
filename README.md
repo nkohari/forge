@@ -497,7 +497,7 @@ and an instance be created.
 For example:
 
 ```js
-import Forge from 'forge-'di';
+import Forge from 'forge-di';
 
 class Foo {
   constructor() {}
