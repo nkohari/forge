@@ -17,7 +17,7 @@ class InstanceResolver extends Resolver {
   toString() {
     if (!this.instance) {
       return '<unknown instance>';
-    } else if ((this.instance.constructor != null ? this.instance.constructor.name : undefined) != null) {
+    } else if (this.instance.constructor && this.instance.constructor.name) {
       return `an instance of ${this.instance.constructor.name}`;
     } else {
       return `an instance of ${typeof(this.instance)}`;
