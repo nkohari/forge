@@ -13,6 +13,7 @@
     "url": "http://nate.io/"
   },
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.1.7",
