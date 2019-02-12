@@ -9,7 +9,7 @@ handles billions of requests each month.
 **Table of Contents**
 
 - [Motivation](#motivation)
-- [New in 11.0.0](#new-in-1100)
+- [New in 12.0.0](#new-in-1200)
 - [Getting started](#getting-started)
 - [So how's it work?](#so-hows-it-work)
 - [Multiple bindings for a single component](#multiple-bindings-for-a-single-component)
@@ -17,7 +17,6 @@ handles billions of requests each month.
 - [Dependency hints](#dependency-hints)
 - [Lifecycles](#lifecycles)
 - [Explicit arguments](#explicit-arguments)
-- [Ephemeral bindings](#ephemeral-bindings)
 - [Unbinding and Rebinding](#unbinding-and-rebinding)
 - [License](#license)
 
@@ -37,54 +36,46 @@ and have released it in the hopes that others will find it useful as well. If yo
 please do, and if you don't, please don't. Either way, please don't feel it necessary to tell me
 that I'm "doing it wrong". :)
 
-## New in 11.0.0
+## New in 12.0.0
 
-Along with most of the JavaScript community, Forge has moved away from CoffeeScript in favor of ES6 via Babel.
-If you need support for CoffeeScript, please use the [0.10.x branch](https://github.com/nkohari/forge/tree/0.10.x).
-Forge has also switched to [semver](http://semver.org/) for version numbers.
+After its humble beginnings in CoffeeScript, and after moving to ES6 in 11.0.0, Forge has now moved to TypeScript.
+This only matters for development, since it's shipped transpiled to ES6 with first-class type definitions.
 
 ### Breaking changes!
 
-The external-facing API has not changed, and *almost* all of the behavior should be identical in the new ES6 version.
-However, some of the internals have changed, so if you've done something exotic like created a custom `Inspector`,
-you may need to update it to match the new internal-facing API.
+The previous bare string syntax for dependency hints has been removed in 12.0.0. Honestly, it was a terrible design
+decision that _sort of_ made sense when using CoffeeScript, but has no place in a post-ES6 world. Even though they
+are technically supported by the ES spec, most transpilers will strip the bare strings out of code.
 
-The only potentially breaking change is with constructor selection. When you ask Forge to create an instance of
-a class (via a `.to.type()` binding), it looks at the arguments of the constructor to determine what dependencies
-the class has. However, a child class can have a default constructor which implicitly calls its parent, for example:
+Instead, manual dependency hints can now be specified with `inject()`, which can be used as a decorator or as a
+higher-order function. For example:
 
 ```js
+import Forge, { inject } from 'forge-di';
+
+@inject({ foo: 'bar' })
 class Parent {
   constructor(foo) {
     this.foo = foo;
   }
 }
 
-class Child extends Parent {
-}
-```
-
-In this case, the dependencies of `Child` are really the same as the dependencies of `Parent`, so Forge should
-really be looking at the constructor of `Parent`. This is what you'd expect:
-
-```js
-import Forge from 'forge-di';
+class Foo {}
+class Bar {}
 
 const forge = new Forge();
+forge.bind('parent').to.type(Parent);
 forge.bind('foo').to.type(Foo);
-forge.bind('child').to.type(Child);
+forge.bind('bar').to.type(Bar);
 
-const child = forge.get('child');
-assert(child.foo instanceof Foo);
+// When Forge resolves the instance of Parent, the dependency hint will cause it to inject
+// an instance of Bar instead of the instance of Foo that it would normally inject.
+const parent = forge.get('parent');
+assert(child.foo instanceof Bar);
 ```
 
-In the past, Forge used a pretty dirty hack to detect when CoffeeScript was adding a default constructor to a class.
-Since the output for a class might vary a bit depending on transpilation, I decided it was time to get rid of this hack.
-
-Instead, when trying to select a constructor, Forge now will search upwards until it finds a constructor
-with a non-zero number of arguments, and inspect that one to determine the dependencies for the class.
-This will almost always result in the same constructor being selected as in the past, but it's possible
-that it may change in some cases! Please be careful and test things well when upgrading from 0.10.x to 11.x.x.
+Ephemeral bindings and the `Forge.create()` function have also been removed. They were an antipattern that
+should be avoided.
 
 ## Getting started
 
@@ -206,15 +197,15 @@ binding is available, and an array of instances when multiple bindings are avail
 To be certain that you only resolve a single instance, you can call `Forge.getOne()` instead.
 This function will throw an exception if more than one matching binding would be resolved.
 
-If, instead, you want to resolve *all* bindings for a given component, you can call `Forge.getAll()`.
+If, instead, you want to resolve _all_ bindings for a given component, you can call `Forge.getAll()`.
 This will ignore the conditions specified on the bindings, and resolve all of them. This
 function will always return an array of instances, even if only a single instance was resolved.
 
 ## Conditional bindings and resolution hints
 
 Since you can register multiple bindings for a single component, you might not always want
-to resolve all of them for a given scenario. To allow this, Forge supports *conditional bindings*,
-which are bindings with a predicate attached. These predicates examine *resolution hints*
+to resolve all of them for a given scenario. To allow this, Forge supports _conditional bindings_,
+which are bindings with a predicate attached. These predicates examine _resolution hints_
 that you pass to `Forge.get()`. For example:
 
 ```js
@@ -232,10 +223,16 @@ class BlueFoo {
 let forge = new Forge();
 
 // Here's the short form, which just does an equality (==) check against the hint:
-forge.bind('foo').to.type(RedFoo).when('red');
+forge
+  .bind('foo')
+  .to.type(RedFoo)
+  .when('red');
 
 // And here's the long form, which allows you to pass in a predicate function:
-forge.bind('foo').to.type(BlueFoo).when(hint => hint === 'blue');
+forge
+  .bind('foo')
+  .to.type(BlueFoo)
+  .when(hint => hint === 'blue');
 
 // Forge passes the resolution hint to the bindings' predicates to determine which to resolve
 let foo1 = forge.get('foo', 'red');
@@ -253,14 +250,32 @@ If multiple bindings match, `Forge.get()` will return an array of results.
 ## Dependency hints
 
 If you don't want to rely on the convention of naming your constructor arguments the same as your
-components, you can add *dependency hints* to your types instead. The syntax is reminiscent
-of `use strict`:
+components, you can add _dependency hints_ to your types instead via the `inject()` function.
+You can use this as a decorator, like this:
 
 ```js
+@inject({ a: 'foo', b: 'bar' })
+class Something {
+  constructor(a, b) { ... }
+}
+```
+
+...or as a higher-order function, like this:
+
+```js
+inject({ a: 'foo', b: 'bar' })(
+  class Something {
+    constructor(a, b) { ... }
+  }
+)
+```
+
+Here's an example of what Forge does when you use `inject()`.
+
+```js
+@inject({ dependency1: 'foo', dependency2: 'bar' })
 class TypeWithHints {
   constructor(dependency1, dependency2) {
-    "dependency1 -> foo";
-    "dependency2 -> bar";
     this.dependency1 = dependency1;
     this.dependency2 = dependency2;
   }
@@ -272,11 +287,11 @@ When Forge creates an instance of `TypeWithHints`, instead of trying to resolve 
 and `bar` instead.
 
 If you have [conditional bindings](#conditional-bindings-and-resolution-hints) registered, you can
-use dependency hints to specify that you'd like to resolve *all* of the available components,
+use dependency hints to specify that you'd like to resolve _all_ of the available components,
 regardless of whether conditions have been set.
 
 ```js
-import Forge from 'forge-di';
+import Forge, { inject, Mode } from 'forge-di';
 
 class RedPlugin {
   constructor() {}
@@ -286,17 +301,23 @@ class BluePlugin {
   constructor() {}
 }
 
+@inject({ plugins: { name: 'plugin', mode: Mode.All } })
 class Facade {
   constructor(plugins) {
-    "plugins -> all plugin";
     this.plugins = plugins;
   }
 }
 
 // Register multiple conditional bindings for the "plugin" component
 let forge = new Forge();
-forge.bind('plugin').to.type(RedPlugin).when('red');
-forge.bind('plugin').to.type(BluePlugin).when('blue');
+forge
+  .bind('plugin')
+  .to.type(RedPlugin)
+  .when('red');
+forge
+  .bind('plugin')
+  .to.type(BluePlugin)
+  .when('blue');
 forge.bind('facade').to.type(Facade);
 
 // Forge disregards the conditions and passes an array of instances to the Facade constructor
@@ -312,7 +333,7 @@ you can specify an additional hint you'd like to use to resolve the dependency i
 (Yo dawg, I heard you like hints...)
 
 ```js
-import Forge from 'forge-di';
+import Forge, { inject } from 'forge-di';
 
 class RedPlugin {
   constructor() {}
@@ -322,17 +343,23 @@ class BluePlugin {
   constructor() {}
 }
 
+@inject({ plugin: { hint: 'blue' } })
 class Facade {
   constructor(plugin) {
-    "plugin -> plugin: blue";
     this.plugin = plugin;
   }
 }
 
 // Register multiple conditional bindings for the "plugin" component
 let forge = new Forge();
-forge.bind('plugin').to.type(RedPlugin).when('red');
-forge.bind('plugin').to.type(BluePlugin).when('blue');
+forge
+  .bind('plugin')
+  .to.type(RedPlugin)
+  .when('red');
+forge
+  .bind('plugin')
+  .to.type(BluePlugin)
+  .when('blue');
 forge.bind('facade').to.type(Facade);
 
 // Forge uses the additional hint to determine which conditional binding to resolve
@@ -343,7 +370,7 @@ assert(facade.plugin instanceof BluePlugin);
 ## Lifecycles
 
 By default, once a binding has been resolved, the result will be cached and re-used for
-subsequent requests. This is called a *singleton* lifecycle, after the pattern of the same
+subsequent requests. This is called a _singleton_ lifecycle, after the pattern of the same
 name.
 
 You can define a lifecycle for a binding using the following syntax:
@@ -365,7 +392,10 @@ let forge = new Forge();
 
 // Since singleton is the default lifecycle, you can also omit .as.singleton()
 forge.bind('foo').to.type(Foo);
-forge.bind('bar').to.type(Bar).as.singleton();
+forge
+  .bind('bar')
+  .to.type(Bar)
+  .as.singleton();
 
 // The instance of Bar is created on the first request, and then is re-used when creating Foo
 let bar = forge.get('bar');
@@ -373,7 +403,7 @@ let foo = forge.get('foo');
 assert(foo.bar === bar);
 ```
 
-Forge also supports a *transient* lifecycle, which means that a new result will be resolved
+Forge also supports a _transient_ lifecycle, which means that a new result will be resolved
 on each request for a given component. Here's the same example as above, using the transient
 lifecycle instead:
 
@@ -393,7 +423,10 @@ class Bar {
 let forge = new Forge();
 
 forge.bind('foo').to.type(Foo);
-forge.bind('bar').to.type(Bar).as.transient();
+forge
+  .bind('bar')
+  .to.type(Bar)
+  .as.transient();
 
 // There were two instances of Bar created
 let bar = forge.get('bar');
@@ -405,7 +438,7 @@ assert(foo.bar !== bar);
 
 Rather than allowing Forge to figure everything out for you, sometimes you may want
 to take manual control over part of the dependency resolution process. To allow this,
-Forge lets you supply *explicit arguments* to your bindings, overriding dependencies
+Forge lets you supply _explicit arguments_ to your bindings, overriding dependencies
 by name.
 
 Here's an example:
@@ -425,7 +458,10 @@ let manuallyCreatedBar = new Bar();
 
 // Tell the binding when "bar" is requested, just return the instance we just manually created.
 let forge = new Forge();
-forge.bind('foo').to.type(Foo).with({bar: manuallyCreatedBar});
+forge
+  .bind('foo')
+  .to.type(Foo)
+  .with({ bar: manuallyCreatedBar });
 
 // Forge will pass the explicit argument to the constructor of Foo
 let foo = forge.get('foo');
@@ -447,7 +483,10 @@ let manuallyCreatedBar = new Bar();
 
 // Explicitly set the value for the parameter named "bar"
 let forge = new Forge();
-forge.bind('foo').to.function(createFoo).with({bar: manuallyCreatedBar});
+forge
+  .bind('foo')
+  .to.function(createFoo)
+  .with({ bar: manuallyCreatedBar });
 
 // Forge will pass the explicit argument to the function.
 let foo = forge.get();
@@ -457,7 +496,7 @@ assert(foo.bar === manuallyCreatedBar);
 
 Note: if (for some reason) you specify a [dependency hint](#dependency-hints) on one of
 the arguments to a constructor or function, the explicit argument name must match the
-*hinted name*, not the *actual name* of the argument.
+_hinted name_, not the _actual name_ of the argument.
 
 ## Dependencies on the Forge itself
 
@@ -485,45 +524,7 @@ assert(obj instanceof DependsOnForge);
 assert(obj.forge === forge);
 ```
 
-*Use this sparingly!* You should always favor constructor injection to service location.
-
-## Ephemeral Bindings
-
-Sometimes you don't want to register all of your types with the Forge, instead only
-resolving their dependencies. If you already know what type you want to resolve,
-you can pass it to `Forge.create()` to request that its dependencies be resolved,
-and an instance be created.
-
-For example:
-
-```js
-import Forge from 'forge-di';
-
-class Foo {
-  constructor() {}
-}
-
-class DependsOnFoo {
-  constructor(foo) {
-    this.foo = foo;
-  }
-}
-
-let forge = new Forge();
-forge.bind('foo').to.type(Foo);
-
-let obj = forge.create(DependsOnFoo);
-assert(obj instanceof DependsOnFoo);
-assert(obj.foo instanceof Foo);
-```
-
-This effectively creates a temporary transient binding to `DependsOnFoo` that will only be
-resolved during the call to `Forge.create()`, and then discarded. You should avoid using
-this feature unless you're sure it's what you want. Most of your types should be registered
-as normal bindings, particularly if:
-
-1. You're resolving a dependency on the Forge itself in order to call `Forge.create()`.
-2. The type you're resolving via `Forge.create()` is a dependency of another type.
+_Use this sparingly!_ You should always favor constructor injection to service location.
 
 ## Unbinding and Rebinding
 
@@ -576,7 +577,7 @@ a = forge.get('a');
 assert(a instanceof Bar);
 ```
 
-*Be careful with unbinding and rebinding!* Treating your container as mutable can make it very
+_Be careful with unbinding and rebinding!_ Treating your container as mutable can make it very
 easy to get into a confusing situation where the bindings between your components are unclear.
 This functionality is primarily provided to make setting up integration tests easier &mdash;
 avoid using it at runtime.
