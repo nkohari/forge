@@ -1,0 +1,2 @@
+declare type Predicate = (hint: any) => boolean;
+export default Predicate;
