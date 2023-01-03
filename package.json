@@ -1,6 +1,6 @@
 {
   "name": "forge-di",
-  "version": "12.1.1",
+  "version": "12.1.2",
   "description": "a dependency injector for node.js",
   "license": "Apache-2.0",
   "repository": {
@@ -13,6 +13,7 @@
     "url": "http://nate.io/"
   },
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "devDependencies": {
     "@types/chai": "^4.1.7",
