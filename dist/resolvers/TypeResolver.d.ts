@@ -7,7 +7,7 @@ import Forge from '../Forge';
 declare class TypeResolver extends Resolver {
     type: Constructor;
     constructor(forge: Forge, binding: Binding, type: Constructor);
-    resolve(context: Context, args: Arguments): any;
+    resolve(context: Context, args: Arguments): unknown;
     toString(): string;
 }
 export default TypeResolver;

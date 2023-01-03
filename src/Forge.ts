@@ -17,12 +17,12 @@ class Forge {
     this.inspector = config.inspector || new RegexInspector();
   }
 
-  bind(name: string): Binding {
+  bind<T = unknown>(name: string): Binding<T> {
     ensure('name', name);
     const binding = new Binding(this, name);
     const list = this.bindings[name] ? this.bindings[name] : (this.bindings[name] = []);
     list.push(binding);
-    return binding;
+    return binding as Binding<T>;
   }
 
   unbind(name: string): number {
@@ -38,22 +38,22 @@ class Forge {
     return this.bind(name);
   }
 
-  get<T = any>(name: string, hint: any = null, args: Arguments = null): T {
+  get<T = unknown>(name: string, hint: any = null, args: Arguments = null): T {
     ensure('name', name);
-    return this.resolve(name, new Context(), hint, args, Mode.AtLeastOne);
+    return this.resolve(name, new Context(), hint, args, Mode.AtLeastOne) as T;
   }
 
-  getOne<T = any>(name: string, hint: any = null, args: Arguments = null): T {
+  getOne<T = unknown>(name: string, hint: any = null, args: Arguments = null): T {
     ensure('name', name);
-    return this.resolve(name, new Context(), hint, args, Mode.AtMostOne);
+    return this.resolve(name, new Context(), hint, args, Mode.AtMostOne) as T;
   }
 
-  getAll<T = any>(name: string, args: Arguments = null): T[] {
+  getAll<T = unknown>(name: string, args: Arguments = null): T[] {
     ensure('name', name);
-    return this.resolve(name, new Context(), undefined, args, Mode.All);
+    return this.resolve(name, new Context(), undefined, args, Mode.All) as T[];
   }
 
-  resolve(name: string, context: Context, hint: any, args: Arguments, mode: Mode = Mode.AtLeastOne): any {
+  resolve(name: string, context: Context, hint: any, args: Arguments, mode: Mode = Mode.AtLeastOne): unknown {
     ensure('name', name);
 
     let bindings: Binding[];

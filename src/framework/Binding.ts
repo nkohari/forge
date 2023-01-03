@@ -9,10 +9,12 @@ import InstanceResolver from '../resolvers/InstanceResolver';
 import TypeResolver from '../resolvers/TypeResolver';
 import ensure from '../util/ensure';
 import Forge from '../Forge';
+import Arguments from './Arguments';
 import Constructor from './Constructor';
+import Context from './Context';
 import Predicate from './Predicate';
 
-class Binding {
+class Binding<T = unknown> {
   forge: Forge;
   name: string;
   lifecycle: Lifecycle;
@@ -29,19 +31,19 @@ class Binding {
     this.arguments = {};
   }
 
-  type(target: Constructor) {
+  type(target: Constructor<T>) {
     ensure('target', target);
     this.resolver = new TypeResolver(this.forge, this, target);
     return this;
   }
 
-  function(target: Function) {
+  function(target: (...args: any[]) => T) {
     ensure('target', target);
     this.resolver = new FunctionResolver(this.forge, this, target);
     return this;
   }
 
-  instance(target: any) {
+  instance(target: T) {
     ensure('target', target);
     this.resolver = new InstanceResolver(this.forge, this, target);
     return this;
@@ -57,7 +59,7 @@ class Binding {
     return this;
   }
 
-  with(args) {
+  with(args: Arguments) {
     ensure('args', args);
     this.arguments = args;
     return this;
@@ -85,7 +87,7 @@ class Binding {
     return this.predicate ? this.predicate(hint) : true;
   }
 
-  resolve(context, hint, args = {}) {
+  resolve(context: Context, hint: any, args: Arguments = {}): T {
     ensure('context', context);
 
     if (this.lifecycle == null) {

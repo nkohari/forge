@@ -10,13 +10,13 @@ declare class Forge {
     };
     inspector: Inspector;
     constructor(config?: Config);
-    bind(name: string): Binding;
+    bind<T = unknown>(name: string): Binding<T>;
     unbind(name: string): number;
     rebind(name: string): Binding;
-    get<T = any>(name: string, hint?: any, args?: Arguments): T;
-    getOne<T = any>(name: string, hint?: any, args?: Arguments): T;
-    getAll<T = any>(name: string, args?: Arguments): T[];
-    resolve(name: string, context: Context, hint: any, args: Arguments, mode?: Mode): any;
+    get<T = unknown>(name: string, hint?: any, args?: Arguments): T;
+    getOne<T = unknown>(name: string, hint?: any, args?: Arguments): T;
+    getAll<T = unknown>(name: string, args?: Arguments): T[];
+    resolve(name: string, context: Context, hint: any, args: Arguments, mode?: Mode): unknown;
     inspect(): string;
     private getMatchingBindings;
 }
