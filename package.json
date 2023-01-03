@@ -1,6 +1,6 @@
 {
   "name": "forge-di",
-  "version": "12.1.0",
+  "version": "12.1.1",
   "description": "a dependency injector for node.js",
   "license": "Apache-2.0",
   "repository": {
@@ -14,11 +14,12 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "chai": "^4.2.0",
+    "command-line-args": "^5.2.1",
+    "esbuild": "^0.16.13",
     "mocha": "^5.2.0",
     "prettier": "^1.16.4",
     "rimraf": "2.6.1",
@@ -32,7 +33,10 @@
     "printWidth": 120
   },
   "scripts": {
-    "test": "ts-mocha --reporter spec test/**/*.tests.ts",
-    "build": "rimraf dist && tsc"
+    "build": "npm run build:library && npm run build:types",
+    "build:library": "node build.js",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "dev": "node build.js --watch",
+    "test": "ts-mocha --reporter spec test/**/*.tests.ts"
   }
 }
